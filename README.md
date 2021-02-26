@@ -9,7 +9,7 @@ https://lofar-surveys.org/ \
 
 ### Clone repo
 You need to clone this repo with:
-```git clone advanced_astro_visualization```
+```git clone https://github.com/jurjen93/advanced_astro_visualiziation.git```
 
 ### Catalogue csv file
 You need to have a catalogue with sources. We have an example given in the folder 'catalogue'.
