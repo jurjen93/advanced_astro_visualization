@@ -7,6 +7,7 @@ import argparse
 parser = argparse.ArgumentParser("Make poster from fits file.")
 parser.add_argument('-d', '--downloading', type=int, help='download your own data')
 parser.add_argument('-csv', '--csvfile', help='csv file with outliers with RA and DEC in degrees', default='catalogue/catalogue_lockman.csv')
+parser.add_argument('-fi', '--fits', type=str, help='fits file to use')
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -21,7 +22,10 @@ if __name__ == '__main__':
         Image = ImagingLofar(fits_download=True)
     else:
         fits_download = False
-        file = 'fits/lockman_hole.fits'
+        if args.fits:
+            file = args.fits
+        else:
+            file = 'fits/lockman_hole.fits'
         Image = ImagingLofar(fits_file=get_pkg_data_filename(file))
 
     Image.imaging(image_name='main.png', save=True, gaussian=True, dpi=3000)

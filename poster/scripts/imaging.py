@@ -14,7 +14,7 @@ from scipy.ndimage import gaussian_filter
 __all__ = ['ImagingLofar']
 
 class ImagingLofar:
-    def __init__(self,fits_file=None, fits_download: bool=False, vmin: float = -2.5e-05, vmax: float = 6.520e-03,
+    def __init__(self, fits_file=None, fits_download: bool=False, vmin: float = -2.5e-05, vmax: float = 6.520e-03,
                  image_directory: str='poster/images', verbose=True):
         self.verbose = verbose
         if self.verbose:

@@ -13,7 +13,8 @@ parser = argparse.ArgumentParser("Make movie from fits file.")
 parser.add_argument('-d', '--downloading', type=int, help='download your own data')
 parser.add_argument('-csv', '--csvfile', help='csv file with outliers with RA and DEC in degrees')
 parser.add_argument('-o', '--option', help=f'you can use the following standard video options: {" ".join([str(i) for i in options])}')
-parser.add_argument('-f', '--framerate', help='frame rate of your video')
+parser.add_argument('-fr', '--framerate', help='frame rate of your video')
+parser.add_argument('-fi', '--fits', type=str, help='fits file to use')
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -36,7 +37,10 @@ if __name__ == '__main__':
                             framerate=FRAMERATE)
     else:
         fits_download = False
-        file = 'fits/lockman_hole.fits'
+        if args.fits:
+            file = args.fits
+        else:
+            file = 'fits/lockman_hole.fits'
         Movie = MovieMaker(fits_file=get_pkg_data_filename(file),
                            imsize=0.4,#defaul imsize
                             framerate=FRAMERATE)
