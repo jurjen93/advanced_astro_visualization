@@ -1,0 +1,22 @@
+#ignore image directory
+/images
+#ignore fits files
+*.fits
+#ignore environments
+/venv
+#notebooks
+*.ipynb
+.ipynb_checkpoints
+#.idea
+.idea
+#pycache
+__pycache__
+#pdf files
+*.pdf
+#images
+*.png
+#video
+*.mp4
+*.mp3
+#git
+.git
