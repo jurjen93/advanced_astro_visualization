@@ -73,7 +73,7 @@ class MovieMaker(ImagingLofar):
         N_max = len(os.listdir('video/frames'))+len(self.ragrid) #max number of videos
         N_min = len(os.listdir('video/frames')) #min number of videos
         inputs = zip(range(N_min, N_max), self.ragrid, self.decgrid, self.imsizes,
-                     np.clip(150/np.array(self.imsizes), a_min=150, a_max=300))
+                     np.clip(150/np.array(self.imsizes), a_min=200, a_max=400))
         if self.process == "multithread":
             print(f"Multithreading")
             print(f"Might get error or bad result because multithreading is difficult with imaging.")
@@ -94,7 +94,7 @@ class MovieMaker(ImagingLofar):
         :param first_time: Is this the first move? If so, give True.
         :param ra: Right Ascension of end point.
         :param dec: Declination of end point.
-        :param speed: This term can speed up the frame creation.
+        :param N_frames: Number of frames.
         """
         if first_time:
             start_ra, start_dec = max(ra, 0), max(dec, 0)
@@ -116,8 +116,9 @@ class MovieMaker(ImagingLofar):
     def zoom_in(self, N_frames: int = None, first_time: bool=False, imsize_out: float = None):
         """
         Zoom in.
+        :param N_frames: Number of frames.
         :param first_time: Is this the first move? If so, give True.
-        :param stepsize: Step size in degrees.
+        :param imsize_out: Output image size.
         """
         if first_time:
             begin_size = self.image_data.shape[0]*np.max(self.wcs.pixel_scale_matrix)/4
@@ -138,8 +139,8 @@ class MovieMaker(ImagingLofar):
     def zoom_out(self, N_frames: int = None, imsize_out: float = None):
         """
         Zoom out.
-        :param N_frames: Step size in degrees.
-        :param imsize_out: imsize to end with
+        :param N_frames: Number of frames.
+        :param imsize_out: Output image size.
         """
         self.imsizes = np.linspace(self.imsize, imsize_out, N_frames)
         self.imsize = self.imsizes[-1]
@@ -156,7 +157,7 @@ class MovieMaker(ImagingLofar):
         os.system(f'rm movie.mp4; ffmpeg -f image2 -r {self.framerate} -start_number 0 -i video/frames/image_%05d.png movie.mp4')
         if audio:
             audio_file = input(audio)
-            os.system(f'python3 video/scripts.add_audio.py -v movie.mp4 -a {audio_file}')
+            os.system(f'ffmpeg -i movie.mp4 -i {audio_file} -c copy audiomovie.mp4')
         return self
 
 if __name__ == '__main__':

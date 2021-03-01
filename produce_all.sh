@@ -8,7 +8,7 @@
 #make_video.py flags
 #-csv -> give catalogue csv-file.
 #-d -> download fits file. Give 1 if yes.
-#-o -> movie make option. Currently there are 2 two standard options. So, give 1 or 2.
+#-N -> number of sources from catalogue.
 #-f -> frame rate of the video. Advice is to use 60 to make video smooth.
 #-fi -> fits file to use. (If you don't download your fits file)
 

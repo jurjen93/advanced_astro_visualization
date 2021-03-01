@@ -41,12 +41,13 @@ Run:\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
 * ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster.
-* ```-o``` -> Choose one of the two standard options (```1``` or ```2```)
+* ```-N``` -> Number of sources to use
 * ```-fr``` -> Frame rate of the video. Advice is to use ```60``` to make the video smooth.
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example:\
-```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -o 2 -f 60```
+```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -N 2 -f 60```
+Example video: https://www.youtube.com/watch?v=r5oo5qSEYbc&feature=youtu.be
 
 ### How to make the interactive plot
 Run:\
@@ -74,7 +75,7 @@ The project is not finished because the following things are still on the todo-l
   Currently there is a script but it doesn't work well yet.  
 * Other fancy updates are welcome as well!
 
-### Collaboration
+### Contact/Collaboration
 
 Feel free to send me a message if you want to help me out with improvements or if you have any suggestions.\
 Contact: jurjendejong(AT)strw.leidenuniv.nl
