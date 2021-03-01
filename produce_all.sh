@@ -16,6 +16,6 @@
 #-d -> download fits file. Give 1 if yes.
 #-fi -> fits file to use. (If you don't download your fits file)
 
-python3 make_movie.py -csv catalogue/catalogue_lockman.csv -o 1 -fr 60
+python3 make_movie.py -csv catalogue/catalogue_lockman.csv -N 2 -fr 60
 python3 make_poster.py -csv catalogue/catalogue_lockman.csv
 python3 make_interactive.py
