@@ -20,7 +20,5 @@ __pycache__
 *.mp3
 #git
 .git
-#html
-*.html
 #csv files
 *.csv
