@@ -32,9 +32,9 @@ if __name__ == '__main__':
 
     for n, position in enumerate(df):
         if position[3]==position[3]:
-            Image.image_cutout(pos=tuple(position[0:2]), size=tuple(position[2:4]), image_name=f'cutout_{n}.png', gaussian=True, save=True)
+            Image.image_cutout(pos=tuple(position[0:2]), size=tuple(position[2:4]), image_name=f'cutout_{n}.png', gaussian=True, save=True, cmap= 'jet')
         else:
-            Image.image_cutout(pos=tuple(position[0:2]), image_name=f'cutout_{n}.png', gaussian=True, save=True)
+            Image.image_cutout(pos=tuple(position[0:2]), image_name=f'cutout_{n}.png', gaussian=True, save=True, cmap= 'jet')
 
     try:
         os.system('python poster/scripts/make_pdf.py')

@@ -18,7 +18,7 @@ args = parser.parse_args()
 if __name__ == '__main__':
     start = timer()
 
-    if args.csvfile: df = pd.read_csv(args.csvfile)[['RA', 'DEC', 'size_x', 'size_y']].to_numpy()
+    if args.csvfile: df = pd.read_csv(args.csvfile)[['RA', 'DEC']]
     else: df = pd.read_csv('catalogue/'+os.listdir('catalogue')[0])
 
     if args.framerate: FRAMERATE = args.framerate
@@ -47,12 +47,35 @@ if __name__ == '__main__':
     Movie.move_to(N_frames=1500, ra=df['RA'].values[0], dec=df['DEC'].values[0]).\
         zoom_in(N_frames=500, imsize_out=0.35).\
         zoom_out(N_frames=500, imsize_out=0.7)
-    for n in range(1, N):#stack multiple sources
+    for n in range(1, N-1):#stack multiple sources
         Movie.move_to(N_frames=1500, ra=df['RA'].values[n], dec=df['DEC'].values[n]).\
             zoom_in(N_frames=500, imsize_out=0.3). \
             zoom_out(N_frames=500, imsize_out=0.7)
     Movie.record()
 
-
     end = timer()
     print(f'MovieMaker took {int(end - start)} seconds')
+
+"""
+HIGH RES EXAMPLE WITH MULTIPLE FITS FILES
+-------------------------------------------------------------------------------------------------------
+Movie = MovieMaker(fits_file=get_pkg_data_filename('fits/lockman_hole.fits'),
+                   imsize=0.2,  # defaul imsize
+                   framerate=FRAMERATE, text='Resolution: 6"')
+Movie.zoom_in(N_frames=500, first_time=True)
+Movie.move_to(N_frames=500, ra=df['RA'].values[0], dec=df['DEC'].values[0])
+Movie.zoom_in(N_frames=500, imsize_out=0.0333)
+Movie_high = MovieMaker(fits_file='fits/0.3/cutout_small_000_source1_0p3asec.fits', highres=True,
+                        new=False, imsize=0.028, framerate=FRAMERATE, text='Resolution: 0.3"')
+Movie_high.zoom_in(N_frames=500, first_time=True, full_im=True)
+Movie_high.zoom_out(N_frames=500, imsize_out=0.0333)
+Movie.zoom_out(N_frames=500, imsize_out=0.2)
+Movie.move_to(N_frames=500, ra=df['RA'].values[1], dec=df['DEC'].values[1])
+Movie.zoom_in(N_frames=500, imsize_out=0.0333)
+Movie_high = MovieMaker(fits_file='fits/0.3/cutout_small_001_source2_0p3asec.fits', highres=True,
+                        new=False, imsize=0.007, framerate=FRAMERATE, text='Resolution: 0.3"')
+Movie_high.zoom_in(N_frames=500, first_time=True, full_im=True)
+Movie_high.zoom_out(N_frames=500, imsize_out=0.0333)
+Movie.record(audio='batchbug-sweet-dreams.mp3')
+-------------------------------------------------------------------------------------------------------
+"""

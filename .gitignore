@@ -22,3 +22,5 @@ __pycache__
 .git
 #html
 *.html
+#csv files
+*.csv
