@@ -67,12 +67,10 @@ Example:\
 ### Future development
 
 The project is not finished because the following things are still on the todo-list:
-* Make sure that higher resolution images can be transformed into a pdf as well.
-* Place the cutouts near the source location with a line attached.
-* Automatically classify sources as interesting for the cutouts.
-* Automatically assign an image size to the object for the cutouts.
-* Add audio file to video automatically. 
-  Currently there is a script but it doesn't work well yet.  
+* Make sure that higher resolution images can be transformed into a pdf as well. (video/poster)
+* Place the cutouts near the source location with a line attached. (poster)
+* Automatically classify sources as interesting for the cutouts. (video/poster)
+* Automatically assign an image size to the object for the cutouts. (poster)
 * Other fancy updates are welcome as well!
 
 ### Contact/Collaboration
