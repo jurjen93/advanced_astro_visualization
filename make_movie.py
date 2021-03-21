@@ -5,6 +5,7 @@ from astropy.utils.data import get_pkg_data_filename
 from timeit import default_timer as timer
 import pandas as pd
 import argparse
+from numpy import sqrt
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser("Make movie from fits file.")
@@ -15,17 +16,20 @@ parser.add_argument('-fi', '--fits', type=str, help='Fits file to use')
 parser.add_argument('-N', '--sourcenum', type=int, help='Number of sources from catalogue')
 args = parser.parse_args()
 
+def distance(obj_1, obj_2):
+    return sqrt((obj_1[0]-obj_2[0])**2+(obj_1[1]-obj_2[1])**2)
+
 if __name__ == '__main__':
     start = timer()
 
-    if args.csvfile: df = pd.read_csv(args.csvfile)[['RA', 'DEC']]
-    else: df = pd.read_csv('catalogue/'+os.listdir('catalogue')[0])
-
     if args.framerate: FRAMERATE = args.framerate
-    else: FRAMERATE = 60
+    else: FRAMERATE = 64
 
     if args.sourcenum: N = args.sourcenum
-    else: N = 1
+    else: N = 2
+
+    if args.csvfile: df = pd.read_csv(args.csvfile)[['RA', 'DEC']]
+    else: df = pd.read_csv('catalogue/'+os.listdir('catalogue')[0])[0:N]
 
     if args.downloading == 1:
         download = input('Paste here your url where to find the fits file: ')
@@ -43,39 +47,30 @@ if __name__ == '__main__':
                            imsize=0.4,#defaul imsize
                             framerate=FRAMERATE)
 
-    Movie.zoom_in(N_frames=500, first_time=True)
-    Movie.move_to(N_frames=1500, ra=df['RA'].values[0], dec=df['DEC'].values[0]).\
-        zoom_in(N_frames=500, imsize_out=0.35).\
-        zoom_out(N_frames=500, imsize_out=0.7)
-    for n in range(1, N-1):#stack multiple sources
-        Movie.move_to(N_frames=1500, ra=df['RA'].values[n], dec=df['DEC'].values[n]).\
-            zoom_in(N_frames=500, imsize_out=0.3). \
-            zoom_out(N_frames=500, imsize_out=0.7)
+    start_coord = Movie.wcs.pixel_to_world(Movie.image_data.shape[0]/2, Movie.image_data.shape[0]/2)
+    start_dec = start_coord.dec.degree
+    start_ra = start_coord.ra.degree
+    Movie.zoom_in(N_frames=1000, first_time=True)
+    for n in range(len(df)):#stack multiple sources
+        if n > 0:
+            dist = distance([last_RA, last_DEC], [df['RA'].values[n], df['DEC'].values[n]])
+            move_to_frames = int(300*dist)
+        else:
+            dist = distance([start_ra, start_dec], [df['RA'].values[n], df['DEC'].values[n]])
+            move_to_frames = int(300*dist)
+        print(f'Number of frames {move_to_frames}')
+        Movie.move_to(N_frames=move_to_frames, ra=df['RA'].values[n], dec=df['DEC'].values[n])
+        Movie.zoom_in(N_frames=300, imsize_out=df['imsize'].values[n])
+        if n<len(df)-1 and df['imsize'].values[n+1]>df['imsize'].values[n]:
+            im_out = max(df['imsize'].values[n+1]+0.1, 0.3)
+        else:
+            im_out = max(df['imsize'].values[n] + 0.1, 0.3)
+        Movie.zoom_out(N_frames=300, imsize_out=im_out)
+        last_RA, last_DEC = df['RA'].values[n], df['DEC'].values[n]
+    Movie.move_to(N_frames=int(600*distance([start_ra, start_dec], [df['RA'].values[N-1], df['DEC'].values[N-1]])), ra=start_ra, dec=start_dec)
+    Movie.zoom_out(N_frames=1000, imsize_out=2)
     Movie.record()
 
     end = timer()
     print(f'MovieMaker took {int(end - start)} seconds')
 
-"""
-HIGH RES EXAMPLE WITH MULTIPLE FITS FILES
--------------------------------------------------------------------------------------------------------
-Movie = MovieMaker(fits_file=get_pkg_data_filename('fits/lockman_hole.fits'),
-                   imsize=0.2,  # defaul imsize
-                   framerate=FRAMERATE, text='Resolution: 6"')
-Movie.zoom_in(N_frames=500, first_time=True)
-Movie.move_to(N_frames=500, ra=df['RA'].values[0], dec=df['DEC'].values[0])
-Movie.zoom_in(N_frames=500, imsize_out=0.0333)
-Movie_high = MovieMaker(fits_file='fits/0.3/cutout_small_000_source1_0p3asec.fits', highres=True,
-                        new=False, imsize=0.028, framerate=FRAMERATE, text='Resolution: 0.3"')
-Movie_high.zoom_in(N_frames=500, first_time=True, full_im=True)
-Movie_high.zoom_out(N_frames=500, imsize_out=0.0333)
-Movie.zoom_out(N_frames=500, imsize_out=0.2)
-Movie.move_to(N_frames=500, ra=df['RA'].values[1], dec=df['DEC'].values[1])
-Movie.zoom_in(N_frames=500, imsize_out=0.0333)
-Movie_high = MovieMaker(fits_file='fits/0.3/cutout_small_001_source2_0p3asec.fits', highres=True,
-                        new=False, imsize=0.007, framerate=FRAMERATE, text='Resolution: 0.3"')
-Movie_high.zoom_in(N_frames=500, first_time=True, full_im=True)
-Movie_high.zoom_out(N_frames=500, imsize_out=0.0333)
-Movie.record(audio='batchbug-sweet-dreams.mp3')
--------------------------------------------------------------------------------------------------------
-"""

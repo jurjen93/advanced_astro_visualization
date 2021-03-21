@@ -19,6 +19,7 @@ Use the following fields:
 * ```DEC```         -> declination of the object
 * ```size_x```      -> size on the x-axis of the object (in pixel or degree size)
 * ```size_y```      -> size on the y-axis of the object (in pixel or degree size)
+* ```imsize```      -> image size in degrees
 
 ### How to make the poster
 

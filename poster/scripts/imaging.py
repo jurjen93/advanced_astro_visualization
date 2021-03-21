@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import SymLogNorm
 from astropy.wcs import WCS
 from astropy.io import fits
 from astropy.utils.data import download_file
@@ -10,6 +9,7 @@ from astropy import coordinates
 import numpy as np
 import os
 from scipy.ndimage import gaussian_filter
+from matplotlib.colors import LogNorm, SymLogNorm
 
 __all__ = ['ImagingLofar']
 
@@ -26,7 +26,7 @@ class ImagingLofar:
         :param image_directory: directory to output the images
         :param verbose: printing extra comments during making
         """
-
+        self.fits_file = fits_file
         self.verbose = verbose
         if self.verbose:
             print(f"Started imaging {fits_file.split('/')[-1].replace('.fits','').replace('_',' ').replace('.',' ').title()}...")
@@ -44,7 +44,7 @@ class ImagingLofar:
         else:
             self.vmin = vmin
         if vmax is None:
-            self.vmax = np.nanstd(self.image_data)*300
+            self.vmax = np.nanstd(self.image_data)*12
         else:
             self.vmax = vmax
         self.image_directory = image_directory
@@ -58,30 +58,36 @@ class ImagingLofar:
         else:
             print(f"Successfully created the directory: '{self.image_directory}'")
 
-    @staticmethod
-    def tonemap(data=None, b: float = 0.5):
+        #Transfer function
+        if 'cutout' in self.fits_file:
+            self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin), sigma=3)
+        else:
+            # self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.5, threshold=0), sigma=2)
+            self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/100), sigma=1)
+
+    def tonemap(self, image_data=None, b: float = 0.25, threshold: float = None):
         """
         Tonemap the image based on dynamic range. This enables both diffuse and point structures to be clearly visible.
         Works best on unsigned data for now. Scaling both negative and positive is a bit experimental.
         This mapping is based on http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.219.7383&rep=rep1&type=pdf
-        Args:
-            data (ndarray) - data to tonemap
-            b (float) - bias parameter >0
-        Returns:
-            data_tm (ndarray) - input data tonemapped with the given bias parameter.
+        :param image_data: image data
+        :param b: smoothing param
+        :param threshold: threshold for positive and residual components
+        :return transformed data
         """
-        data_pos = np.where(data > 0, data, np.nan)
-        # data_neg = np.where(data < 0, data, np.nan)
+        if threshold is None:
+            threshold = 0
+        data_pos = np.where(image_data > threshold, image_data, np.nan)
+        data_res = np.where(image_data < threshold, image_data, np.nan)
         data_pos_tm = (np.nanmax(data_pos) * 0.01 / np.log10(np.nanmax(data_pos) + 1)) * (np.log10(data_pos + 1)) / (
             np.log10(2 + ((data_pos / np.nanmax(data_pos)) ** (np.log10(b) / np.log10(0.5))) * 8))
-        # data_neg_tm = (np.nanmax(data_neg) * 0.01 / np.log10(np.nanmax(data_neg) + 1)) * (np.log10(data_neg + 1)) / (
-        #     np.log10(2 + ((data_neg / np.nanmax(data_neg)) ** (np.log10(b) / np.log10(0.5))) * 8))
-        data_tm = np.where(data > np.nanstd(data), np.sqrt(data_pos_tm), 0)
+        data_res_tm = (np.nanmax(data_res) * 0.01/ np.log10(np.nanmax(data_res) + 1)) * (np.log10(data_res + 1)) / (
+            np.log10(2 + ((data_res / np.nanmax(data_res)) ** (np.log10(b) / np.log10(0.5))) * 8))
+        data_tm = np.where(image_data > threshold, np.sqrt(data_pos_tm), -1*np.sqrt(np.abs(data_res_tm)))
         return data_tm
 
     def imaging(self, image_data=None, wcs=None, image_name: str = 'Nameless', dpi: int = None, save: bool = True,
-                cmap: str = 'CMRmap', gaussian : bool = False, tonemap: bool = False,
-                text: str = None):
+                cmap: str = 'CMRmap', text: str = None, imsize: float = None):
         """
         Imaging of your data.
         ------------------------------------------------------------
@@ -91,8 +97,6 @@ class ImagingLofar:
         :param dpi: dots per inch
         :param save: save the image (yes or no)
         :param cmap: cmap of your image
-        :param gaussian: use gaussian filter or not
-        :param tonemap: use tonemap (see function above) as filter. Useful for high res images
         :param text: text in the left down corner of your image
         """
 
@@ -101,20 +105,30 @@ class ImagingLofar:
         if wcs is None:
             wcs=self.wcs
         if dpi is None:
-            w = 10
-            h = image_data.shape[1]/image_data.shape[0]*10
+            w = 16
+            h = image_data.shape[1]/image_data.shape[0]*9
             dpi = image_data.shape[0]/10
         else:
-            h=10
-            w=10
-        if gaussian:
-            image_data = gaussian_filter(image_data, sigma=3)
+            h=9
+            w=16
         plt.figure(figsize=(h, w))
         plt.subplot(projection=wcs)
-        if tonemap:
-            plt.imshow(gaussian_filter(self.tonemap(image_data), sigma=3), origin='lower', cmap=cmap, vmin=np.nanstd(image_data))
+        if imsize is None:
+            imsize=1
+        if 'cutout' in self.fits_file:
+            plt.imshow(image_data, origin='lower', cmap=cmap, vmin=self.vmin*2)
         else:
-            plt.imshow(image_data, norm=SymLogNorm(linthresh=self.vmin/20, vmin=self.vmin/50, vmax=self.vmax), origin='lower', cmap=cmap)
+            plt.imshow(np.clip(image_data, a_min=None, a_max=self.vmax),
+                       norm=LogNorm(vmin=self.vmin/1.4, vmax=self.vmax), origin='lower', cmap=cmap)
+            #HIGH RES VIDEO:
+            # vmax = self.vmax
+            # vmin = min((2/max(imsize,0.2))*(self.vmin/100), self.vmax/20)
+            # if imsize<1:
+            #     vmax/=max(imsize,0.2)
+            # plt.imshow(image_data,
+            #            norm=SymLogNorm(linthresh=vmin*20, vmin=self.vmin/1.4, vmax=vmax), origin='lower', cmap=cmap)
+            #OLD VIDEO:
+            # plt.imshow(image_data, norm=SymLogNorm(linthresh=self.vmin/20, vmin=self.vmin/50, vmax=self.vmax), origin='lower', cmap=cmap)
         if text:
             plt.annotate(
                 s=text,
@@ -178,7 +192,7 @@ class ImagingLofar:
         return position
 
     def image_cutout(self, pos: tuple = None, size: tuple = (1000, 1000), dpi: float = 1000, image_name: str = 'Nameless',
-                     save: bool = True, cmap: str = 'CMRmap', gaussian : bool = False, tonemap : bool = False, text: str = None):
+                     save: bool = True, cmap: str = 'CMRmap', text: str = None, imsize: float = None):
         """
         Make image cutout and make image
         ------------------------------------------------------------
@@ -188,8 +202,6 @@ class ImagingLofar:
         :param image_name: name of output image
         :param save: save image (yes or no)
         :param cmap: cmap of your image
-        :param gaussian: gaussian filter (make image more smooth)
-        :param tonemap: use tonemap (see function above)
         :param text: text in the left down corner of your image
         """
         ra, dec = pos
@@ -202,7 +214,7 @@ class ImagingLofar:
         if size[0]<dpi:
             dpi=size[0]
         self.imaging(image_data=image_data, wcs=wcs, image_name=image_name, dpi=dpi,
-                     save=save, cmap=cmap, gaussian=gaussian, tonemap=tonemap, text=text)
+                     save=save, cmap=cmap, text=text, imsize=imsize)
         return self
 
 if __name__ == '__main__':

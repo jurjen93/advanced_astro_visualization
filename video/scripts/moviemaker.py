@@ -14,7 +14,7 @@ class MovieMaker(ImagingLofar):
     MovieMaker makes it possible to make individual frames and turn them into a video.
     """
     def __init__(self, fits_file: str = None, imsize: float = None, framerate: float = None, process: str = None,
-                 fits_download: bool=False, new: bool = True, highres: bool = False, text: str = None):
+                 fits_download: bool=False, new: bool = True, text: str = None):
         """
         :param fits_file: fits file name
         :param imsize: initial image size
@@ -28,7 +28,6 @@ class MovieMaker(ImagingLofar):
         self.framerate = framerate
         self.ra = None
         self.dec = None
-        self.highres = highres
         self.text = text
         if new:
             os.system('rm -rf video/frames; mkdir video/frames')
@@ -74,13 +73,12 @@ class MovieMaker(ImagingLofar):
         :param dpi: dots per inch (pixel density)
         """
         self.image_cutout(pos=(ra, dec),
-                          size=(imsize/np.max(self.wcs.pixel_scale_matrix), imsize/np.max(self.wcs.pixel_scale_matrix)),
+                          size=(np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*0.9), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*1.6)),
                           dpi=dpi,
                           image_name=f'image_{str(N).rjust(5, "0")}.png',
-                          gaussian=False,
-                          tonemap=self.highres,
                           cmap='CMRmap',
-                          text=self.text)
+                          text=self.text,
+                          imsize=imsize)
         return self
 
     def make_frames(self):
@@ -91,7 +89,7 @@ class MovieMaker(ImagingLofar):
         N_max = len(os.listdir('video/frames'))+len(self.ragrid) #max number of videos
         N_min = len(os.listdir('video/frames')) #min number of videos
         inputs = zip(range(N_min, N_max), self.ragrid, self.decgrid, self.imsizes,
-                     np.clip(200/np.array(self.imsizes), a_min=100, a_max=350).astype(int))
+                     np.clip(200/np.array(self.imsizes), a_min=250, a_max=600).astype(int))
         if self.process == "multithread":
             print(f"Multithreading")
             print(f"Might get error or bad result because multithreading is difficult with imaging.")
@@ -144,9 +142,9 @@ class MovieMaker(ImagingLofar):
         if first_time:
             begin_size = self.image_data.shape[0] * np.max(self.wcs.pixel_scale_matrix)
             if not full_im:
-                begin_size/=4
+                begin_size/=2
             end_size = self.imsize
-            coordinates = self.wcs.pixel_to_world(self.image_data.shape[0]/2, self.image_data.shape[0]/2)
+            coordinates = self.wcs.pixel_to_world(int(self.image_data.shape[0]/2), int(self.image_data.shape[0]/2))
             self.dec = coordinates.dec.degree
             self.ra = coordinates.ra.degree
         else:
@@ -179,7 +177,7 @@ class MovieMaker(ImagingLofar):
         ------------------------------------------------------------
         :param audio: add audio (True or False).
         """
-        os.system(f'rm movie.mp4; ffmpeg -f image2 -r {self.framerate} -start_number 0 -i video/frames/image_%05d.png movie.mp4')
+        os.system(f'rm movie.mp4; ffmpeg -f image2 -r {self.framerate} -start_number 0 -i video/frames/image_%05d.png -vf "scale=960:540,setsar=1" movie.mp4')
         if audio:
             try:
                 audio_file = input(audio)
