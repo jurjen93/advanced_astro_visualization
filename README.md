@@ -5,7 +5,7 @@ With this repo you can make a **poster**, a **video**, or **interactive plot** o
 Note that this script is written for **astronomy applications**. However, by rewriting some parts in the script, 
 you can also use it for other types of applications. In the example we used the lockman_hole.fits made with LOFAR.\
 Other .fits files from LOFAR can be found here:
-https://lofar-surveys.org/ \
+https://lofar-surveys.org/
 
 ### Clone repo
 You need to clone this repo with:
