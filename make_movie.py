@@ -32,8 +32,6 @@ if __name__ == '__main__':
     else: df = pd.read_csv('catalogue/'+os.listdir('catalogue')[0])[0:N]
 
     if args.downloading == 1:
-        download = input('Paste here your url where to find the fits file: ')
-        fits_download = True
         Movie = MovieMaker(fits_download=True,
                            imsize=0.4,#defaul imsize
                             framerate=FRAMERATE)
