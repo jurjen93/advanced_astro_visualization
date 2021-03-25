@@ -48,9 +48,8 @@ where you can use the following flags
 
 Example:\
 ```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -N 2 -f 60```
-Example videos: \
-https://www.youtube.com/watch?v=r5oo5qSEYbc \
-https://www.youtube.com/watch?v=dwDbPiB35eI
+See also the following blog for more information:
+https://towardsdatascience.com/how-to-make-a-video-from-your-astronomy-images-957f1d40dea1
 
 ### How to make the interactive plot
 Run:\
