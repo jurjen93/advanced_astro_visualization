@@ -47,7 +47,7 @@ where you can use the following flags
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example:\
-```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -N 2 -f 60```
+```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -N 2 -f 60```\
 See also the following blog for more information:
 https://towardsdatascience.com/how-to-make-a-video-from-your-astronomy-images-957f1d40dea1
 
