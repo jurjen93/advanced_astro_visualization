@@ -15,7 +15,7 @@ __all__ = ['ImagingLofar']
 
 class ImagingLofar:
     def __init__(self, fits_file=None, fits_download: bool=False, vmin: float = None, vmax: float = None,
-                 image_directory: str='poster/images', verbose=True):
+                 image_directory: str='poster/images', verbose: bool = True, zoom_effect: bool = True):
         """
         Make LOFAR images (also applicable on other telescope surveys)
         ------------------------------------------------------------
@@ -28,6 +28,7 @@ class ImagingLofar:
         """
         self.fits_file = fits_file
         self.verbose = verbose
+        self.zoom_effect = zoom_effect
         if self.verbose:
             print(f"Started imaging {fits_file.split('/')[-1].replace('.fits','').replace('_',' ').replace('.',' ').title()}...")
         if fits_download:
@@ -62,8 +63,10 @@ class ImagingLofar:
         if 'cutout' in self.fits_file:
             self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin), sigma=3)
         else:
-            # self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.5, threshold=0), sigma=2)
-            self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/100), sigma=1)
+            if self.zoom_effect:
+                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.5, threshold=0), sigma=2)
+            else:
+                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin / 100), sigma=1)
 
     def tonemap(self, image_data=None, b: float = 0.25, threshold: float = None):
         """
@@ -118,17 +121,17 @@ class ImagingLofar:
         if 'cutout' in self.fits_file:
             plt.imshow(image_data, origin='lower', cmap=cmap, vmin=self.vmin*2)
         else:
-            plt.imshow(np.clip(image_data, a_min=None, a_max=self.vmax),
-                       norm=LogNorm(vmin=self.vmin/1.4, vmax=self.vmax), origin='lower', cmap=cmap)
             #HIGH RES VIDEO:
-            # vmax = self.vmax
-            # vmin = min((2/max(imsize,0.2))*(self.vmin/100), self.vmax/20)
-            # if imsize<1:
-            #     vmax/=max(imsize,0.2)
-            # plt.imshow(image_data,
-            #            norm=SymLogNorm(linthresh=vmin*20, vmin=self.vmin/1.4, vmax=vmax), origin='lower', cmap=cmap)
-            #OLD VIDEO:
-            # plt.imshow(image_data, norm=SymLogNorm(linthresh=self.vmin/20, vmin=self.vmin/50, vmax=self.vmax), origin='lower', cmap=cmap)
+            if self.zoom_effect:
+                vmax = self.vmax
+                vmin = min((2/max(imsize,0.2))*(self.vmin/100), self.vmax/20)
+                if imsize<1:
+                    vmax/=max(imsize,0.2)
+                plt.imshow(image_data,
+                           norm=SymLogNorm(linthresh=vmin*20, vmin=self.vmin/1.4, vmax=vmax), origin='lower', cmap=cmap)
+            else:
+                plt.imshow(np.clip(image_data, a_min=None, a_max=self.vmax),
+                           norm=LogNorm(vmin=self.vmin / 1.4, vmax=self.vmax), origin='lower', cmap=cmap)
         if text:
             plt.annotate(
                 s=text,

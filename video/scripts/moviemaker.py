@@ -14,7 +14,8 @@ class MovieMaker(ImagingLofar):
     MovieMaker makes it possible to make individual frames and turn them into a video.
     """
     def __init__(self, fits_file: str = None, imsize: float = None, framerate: float = None, process: str = None,
-                 fits_download: bool=False, new: bool = True, text: str = None):
+                 fits_download: bool=False, new: bool = True, text: str = None, vmin: float = None, vmax: float = None, zoom_effect: bool = False,
+                 output_file: str = 'video/frames'):
         """
         :param fits_file: fits file name
         :param imsize: initial image size
@@ -22,15 +23,18 @@ class MovieMaker(ImagingLofar):
         :param process: process [multiprocess, multithread, None]
         :param fits_download: download fits file
         """
-        super().__init__(fits_file = fits_file, image_directory='video/frames', verbose=False, fits_download = fits_download)
+        self.output_file = output_file
+        super().__init__(fits_file = fits_file, image_directory=self.output_file, verbose=False, fits_download=fits_download, vmin=vmin, vmax=vmax, zoom_effect=zoom_effect)
         self.process = process
         self.imsize = imsize
         self.framerate = framerate
         self.ra = None
         self.dec = None
         self.text = text
+        self.zoom_effect = zoom_effect
         if new:
-            os.system('rm -rf video/frames; mkdir video/frames')
+            os.system(f'rm -rf {output_file}; mkdir {output_file}')
+
 
     def __call__(self, imsize: float = None, process: str = None):
         """
@@ -86,10 +90,10 @@ class MovieMaker(ImagingLofar):
         Record individual frames and save in video/frames/
         ------------------------------------------------------------
         """
-        N_max = len(os.listdir('video/frames'))+len(self.ragrid) #max number of videos
-        N_min = len(os.listdir('video/frames')) #min number of videos
+        N_max = len(os.listdir(self.output_file))+len(self.ragrid) #max number of videos
+        N_min = len(os.listdir(self.output_file)) #min number of videos
         inputs = zip(range(N_min, N_max), self.ragrid, self.decgrid, self.imsizes,
-                     np.clip(200/np.array(self.imsizes), a_min=250, a_max=600).astype(int))
+                     np.clip(200/np.array(self.imsizes), a_min=450, a_max=700).astype(int))
         if self.process == "multithread":
             print(f"Multithreading")
             print(f"Might get error or bad result because multithreading is difficult with imaging.")
@@ -177,7 +181,7 @@ class MovieMaker(ImagingLofar):
         ------------------------------------------------------------
         :param audio: add audio (True or False).
         """
-        os.system(f'rm movie.mp4; ffmpeg -f image2 -r {self.framerate} -start_number 0 -i video/frames/image_%05d.png -vf "scale=960:540,setsar=1" movie.mp4')
+        os.system(f'rm movie.mp4; ffmpeg -f image2 -r {self.framerate} -start_number 0 -i {self.output_file}/image_%05d.png movie.mp4')
         if audio:
             try:
                 audio_file = input(audio)

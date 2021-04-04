@@ -12,7 +12,7 @@ You need to clone this repo with:
 ```git clone https://github.com/jurjen93/advanced_astro_visualiziation.git```
 
 ### Catalogue csv file
-You need to have a catalogue with sources. We have an example given in the folder 'catalogue'.\
+You need to have a catalogue with sources for the poster (for the video it is optional). We have an example given in the folder 'catalogue'.\
 Use the following fields:
 * ```source_id```   -> id of the source
 * ```RA```          -> right ascension of the object
@@ -41,7 +41,7 @@ Run:\
 ```python make_video.py```\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
-* ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster.
+* ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster. If you leave it empty, it goes through the whole field.
 * ```-N``` -> Number of sources to use
 * ```-fr``` -> Frame rate of the video. Advice is to use ```60``` to make the video smooth.
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)

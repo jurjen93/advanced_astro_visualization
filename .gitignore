@@ -22,3 +22,5 @@ __pycache__
 .git
 #csv files
 *.csv
+#files not for github
+make_movie_highres.py
