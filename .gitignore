@@ -2,6 +2,7 @@
 /images
 #ignore fits files
 *.fits
+/fits
 #ignore environments
 /venv
 #notebooks
@@ -23,4 +24,5 @@ __pycache__
 #csv files
 *.csv
 #files not for github
-make_movie_highres.py
+highres_*
+leahfiles/

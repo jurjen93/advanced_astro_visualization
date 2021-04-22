@@ -42,12 +42,11 @@ Run:\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
 * ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster. If you leave it empty, it goes through the whole field.
-* ```-N``` -> Number of sources to use
 * ```-fr``` -> Frame rate of the video. Advice is to use ```60``` to make the video smooth.
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example:\
-```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -N 2 -f 60```\
+```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -f 60```\
 See also the following blog for more information:
 https://towardsdatascience.com/how-to-make-a-video-from-your-astronomy-images-957f1d40dea1
 

@@ -45,7 +45,7 @@ class ImagingLofar:
         else:
             self.vmin = vmin
         if vmax is None:
-            self.vmax = np.nanstd(self.image_data)*12
+            self.vmax = np.nanstd(self.image_data)*20
         else:
             self.vmax = vmax
         self.image_directory = image_directory
@@ -62,11 +62,14 @@ class ImagingLofar:
         #Transfer function
         if 'cutout' in self.fits_file:
             self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin), sigma=3)
+        elif 'ILTJ' in self.fits_file:
+            self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/1.5), sigma=4)
         else:
             if self.zoom_effect:
                 self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.5, threshold=0), sigma=2)
             else:
-                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin / 100), sigma=1)
+                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/100), sigma=1)
+
 
     def tonemap(self, image_data=None, b: float = 0.25, threshold: float = None):
         """
@@ -126,7 +129,10 @@ class ImagingLofar:
                 vmax = self.vmax
                 vmin = min((2/max(imsize,0.2))*(self.vmin/100), self.vmax/20)
                 if imsize<1:
-                    vmax/=max(imsize,0.2)
+                    vmax/=max(imsize, 0.2)
+                if imsize<0.05:
+                    vmin+=imsize/20
+                    image_data=gaussian_filter(image_data, sigma=min(10, int(imsize/0.05)))
                 plt.imshow(image_data,
                            norm=SymLogNorm(linthresh=vmin*20, vmin=self.vmin/1.4, vmax=vmax), origin='lower', cmap=cmap)
             else:
@@ -206,6 +212,7 @@ class ImagingLofar:
         :param save: save image (yes or no)
         :param cmap: cmap of your image
         :param text: text in the left down corner of your image
+        :param imsize: image size in degrees
         """
         ra, dec = pos
         pix_x, pix_y = self.to_pixel(ra, dec)

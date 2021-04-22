@@ -5,6 +5,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 import warnings
 from poster.scripts.imaging import ImagingLofar
 from tqdm import tqdm
+import cv2 as cv
+from glob import glob
 warnings.filterwarnings("ignore")
 
 __all__ = ['MovieMaker']
@@ -63,8 +65,7 @@ class MovieMaker(ImagingLofar):
 
     def __setstate__(self, state):
         """ This is called while unpickling. """
-        if self.process == 'multiprocess':
-            self.__dict__.update(state)
+        self.__dict__.update(state)
 
     def make_frame(self, N, ra = None, dec = None, imsize: float = None, dpi: float = 300):
         """
@@ -77,7 +78,7 @@ class MovieMaker(ImagingLofar):
         :param dpi: dots per inch (pixel density)
         """
         self.image_cutout(pos=(ra, dec),
-                          size=(np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*0.9), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*1.6)),
+                          size=(np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*1.77)),
                           dpi=dpi,
                           image_name=f'image_{str(N).rjust(5, "0")}.png',
                           cmap='CMRmap',
@@ -100,9 +101,10 @@ class MovieMaker(ImagingLofar):
             with ThreadPool(8) as p:
                 p.starmap(self.make_frame, inputs)
         elif self.process == 'multiprocess':
-            print(f"You are using {cpu_count()} cpu's for multiprocessing")
-            with Pool(cpu_count()) as p:
-                p.starmap(self.make_frame, inputs)
+            cpus=2
+            print(f"You are using {cpus} cpu's for multiprocessing")
+            with Pool(cpus) as p:
+                p.starmap(self.make_frame, inputs, chunksize=2)
         else:
             for inp in tqdm(inputs):
                 self.make_frame(inp[0], inp[1], inp[2], inp[3], inp[4])
@@ -153,7 +155,7 @@ class MovieMaker(ImagingLofar):
             self.ra = coordinates.ra.degree
         else:
             begin_size = self.imsize
-            end_size = max(imsize_out, 0.03)
+            end_size = imsize_out
         self.imsizes = np.linspace(end_size, begin_size, N_frames)[::-1]
         self.imsize = self.imsizes[-1]
         self.ragrid = np.array([self.ra]*len(self.imsizes))
@@ -169,7 +171,7 @@ class MovieMaker(ImagingLofar):
         :param imsize_out: Output image size.
         """
         self.imsizes = np.linspace(self.imsize, imsize_out, N_frames)
-        self.imsize = self.imsizes[-1]
+        self.imsize = imsize_out
         self.ragrid = np.array([self.ra]*len(self.imsizes))
         self.decgrid = np.array([self.dec]*len(self.imsizes))
         self.make_frames()
@@ -189,6 +191,38 @@ class MovieMaker(ImagingLofar):
             except:
                 print('Audio file does not exist')
         return self
+
+def crop_center(img,cropx,cropy):
+    y,x,_ = img.shape
+    startx = x//2-(cropx//2)
+    starty = y//2-(cropy//2)
+    return img[starty:starty+cropy,startx:startx+cropx,:]
+
+def fading_effect(source, frames):
+    images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/video/frames_high/*')
+    img1 = cv.imread(sorted(images)[-1])
+    img1 = cv.GaussianBlur(img1, (5,5), 0)
+    img2 = cv.imread(glob(f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/fits/highres_P205/{source}*MFS-image.png')[0])
+
+    #add extra empty rows to reshape img2
+    add_rows = int((img1.shape[1]/img1.shape[0]*img2.shape[1]-img2.shape[1])/2)
+    new = np.zeros((img2.shape[0], img2.shape[1]+add_rows*2, 3), dtype=np.float32)
+    new[:, add_rows:new.shape[1]-add_rows, :] = img2
+    img2 = new
+    #resize now img2
+    img1 = cv.resize(img1, (img2.shape[1], img2.shape[0]), interpolation=cv.INTER_AREA) # reshape image
+    for i in np.append(np.linspace(0, 1, frames//2), np.linspace(0, 1, frames//2)[::-1]):
+        alpha = i
+        beta = 1 - alpha
+        output = cv.addWeighted(img2, alpha, img1, beta, 0, dtype=cv.CV_32F)
+        output = crop_center(output, int((1 - i/4) * output.shape[1]), int((1 - i/4) * output.shape[0]))
+        n=1
+        if alpha==1:
+            n=frames//6
+        for r in range(n):
+            images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/video/frames_high/*')
+            new_im_name = f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/video/frames_high/image_{str(len(images)).rjust(5, "0")}.png'
+            cv.imwrite(new_im_name, output)
 
 if __name__ == '__main__':
     print('Cannot call script directly.')
