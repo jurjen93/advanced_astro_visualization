@@ -42,13 +42,23 @@ Run:\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
 * ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster. If you leave it empty, it goes through the whole field.
-* ```-fr``` -> Frame rate of the video. Advice is to use ```60``` to make the video smooth.
+* ```-fr``` -> Frame rate of the video. Advice is to use ```20``` to make the video smooth but doesn't take too long to record.
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
-Example:\
+Example pan through source by source from your csv file:\
 ```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -f 60```\
+Example of pan through a whole field:\
+```python make_video.py -fi fits/your_fits.fits```\
+In the video one can see the coordinates. If you want to make a separate image from this, you can run the following:\
+```python make_image.py -fi fits/your_fits.fits -ra 123.123 -dec 51.123 -si 0.4```\
+where you can use the following flags
+* ```-si``` -> Size in degrees.
+* ```-dec``` -> Declination in degrees.
+* ```-ra``` -> Right ascension in degrees.
+* ```-fi``` -> Fits file to use.
+
 See also the following blog for more information:
-https://towardsdatascience.com/how-to-make-a-video-from-your-astronomy-images-957f1d40dea1
+https://towardsdatascience.com/how-to-make-a-video-from-your-astronomy-images-957f1d40dea1\
 
 ### How to make the interactive plot
 Run:\
@@ -58,23 +68,13 @@ where you can use the following flags
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example:\
-```python make_interactive.py -fi fits/lockman_hole.fits```
+```python make_interactive.py -fi fits/your_fits.fits```
 
 ### Output
 **Poster**: *poster.pdf*\
 **Video**: *movie.mp4*\
 **Interactive plot**: *interactive.html*
 
-### Future development
-
-The project is not finished because the following things are still on the todo-list:
-* Make sure that higher resolution images can be transformed into a pdf as well. (video/poster)
-* Place the cutouts near the source location with a line attached. (poster)
-* Automatically classify sources as interesting for the cutouts. (video/poster)
-* Automatically assign an image size to the object for the cutouts. (poster)
-* Other fancy updates are welcome as well!
-
 ### Contact/Collaboration
-
 Feel free to send me a message if you want to help me out with improvements or if you have any suggestions.\
 Contact: jurjendejong(AT)strw.leidenuniv.nl

@@ -10,12 +10,14 @@ import numpy as np
 import os
 from scipy.ndimage import gaussian_filter
 from matplotlib.colors import LogNorm, SymLogNorm
+import warnings
+warnings.filterwarnings("ignore")
 
 __all__ = ['ImagingLofar']
 
 class ImagingLofar:
     def __init__(self, fits_file=None, fits_download: bool=False, vmin: float = None, vmax: float = None,
-                 image_directory: str='poster/images', verbose: bool = True, zoom_effect: bool = True):
+                 image_directory: str='poster/images', verbose: bool = True, zoom_effect: bool = True, interactive: bool = False):
         """
         Make LOFAR images (also applicable on other telescope surveys)
         ------------------------------------------------------------
@@ -60,15 +62,19 @@ class ImagingLofar:
             print(f"Successfully created the directory: '{self.image_directory}'")
 
         #Transfer function
-        if 'cutout' in self.fits_file:
-            self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin), sigma=3)
-        elif 'ILTJ' in self.fits_file:
-            self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/1.5), sigma=4)
-        else:
-            if self.zoom_effect:
-                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.5, threshold=0), sigma=2)
+        if not interactive:
+            if 'cutout' in self.fits_file:
+                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin), sigma=3)
+            elif 'ILTJ' in self.fits_file:
+                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/1.5), sigma=4)
             else:
-                self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/100), sigma=1)
+                if self.zoom_effect:
+                    self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.5, threshold=0), sigma=2)
+                else:
+                    self.image_data = gaussian_filter(self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin/100), sigma=1)
+        else:
+            self.image_data = gaussian_filter(
+                self.tonemap(image_data=self.image_data, b=0.25, threshold=self.vmin / 100), sigma=1)
 
 
     def tonemap(self, image_data=None, b: float = 0.25, threshold: float = None):
@@ -93,7 +99,7 @@ class ImagingLofar:
         return data_tm
 
     def imaging(self, image_data=None, wcs=None, image_name: str = 'Nameless', dpi: int = None, save: bool = True,
-                cmap: str = 'CMRmap', text: str = None, imsize: float = None):
+                cmap: str = 'CMRmap', text: str = None, imsize: float = None, ra=None, dec=None):
         """
         Imaging of your data.
         ------------------------------------------------------------
@@ -130,9 +136,10 @@ class ImagingLofar:
                 vmin = min((2/max(imsize,0.2))*(self.vmin/100), self.vmax/20)
                 if imsize<1:
                     vmax/=max(imsize, 0.2)
-                if imsize<0.05:
-                    vmin+=imsize/20
-                    image_data=gaussian_filter(image_data, sigma=min(10, int(imsize/0.05)))
+                if imsize<0.1:
+                    vmin+=imsize/100*(0.1/imsize)**1.35
+                image_data=gaussian_filter(image_data, sigma=2)
+
                 plt.imshow(image_data,
                            norm=SymLogNorm(linthresh=vmin*20, vmin=self.vmin/1.4, vmax=vmax), origin='lower', cmap=cmap)
             else:
@@ -147,6 +154,16 @@ class ImagingLofar:
                 ha='left',
                 fontsize=20,
                 bbox=dict(facecolor='white', alpha=1),
+            )
+        elif ra and dec and imsize>0.1:
+            plt.annotate(
+                s=f'RA: {round(ra, 5)}\nDEC: {round(dec, 5)}',
+                xy=(0, 0),
+                xytext=(0, 0),
+                va='top',
+                ha='left',
+                fontsize=10,
+                bbox=dict(facecolor='white', alpha=0.7),
             )
         plt.xlabel('Galactic Longitude')
         plt.ylabel('Galactic Latitude')
@@ -200,7 +217,7 @@ class ImagingLofar:
         position = np.array(position.to_pixel(self.wcs))
         return position
 
-    def image_cutout(self, pos: tuple = None, size: tuple = (1000, 1000), dpi: float = 1000, image_name: str = 'Nameless',
+    def image_cutout(self, pos: tuple = None, size: tuple = None, dpi: float = 1000, image_name: str = None,
                      save: bool = True, cmap: str = 'CMRmap', text: str = None, imsize: float = None):
         """
         Make image cutout and make image
@@ -216,15 +233,40 @@ class ImagingLofar:
         """
         ra, dec = pos
         pix_x, pix_y = self.to_pixel(ra, dec)
-        if size[0]<2 and size[0]<2:
-            size = self.to_pixel(size[0], size[1])
+        if size:
+            if size[0]<2 and size[0]<2:
+                size = (np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)))
+        else:
+            size = (np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)))
         image_data, wcs = self.make_cutout((pix_x, pix_y), size)
         if self.verbose:
             print(f"Let's now image '{image_name.replace('_',' ').replace('.png','').replace('.',' ').title()}'")
         if size[0]<dpi:
             dpi=size[0]
         self.imaging(image_data=image_data, wcs=wcs, image_name=image_name, dpi=dpi,
-                     save=save, cmap=cmap, text=text, imsize=imsize)
+                     save=save, cmap=cmap, text=text, imsize=imsize, ra=ra, dec=dec)
+        return self
+
+    def make_fits(self, pos: tuple = None, size: tuple = (1000, 1000), filename: str = None, imsize: float = None):
+        """
+        Make image cutout and make fitsfile
+        ------------------------------------------------------------
+        :param pos: position in degrees (RA, DEC)
+        :param size: size of your image in pixel size
+        :param filename: name of output fits image
+        :param imsize: image size in degrees
+        """
+        ra, dec = pos
+        pix_x, pix_y = self.to_pixel(ra, dec)
+        if size:
+            if size[0]<2 and size[0]<2:
+                size = (np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)))
+        else:
+            size = (np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)))
+        image_data, wcs = self.make_cutout((pix_x, pix_y), size)
+        self.hdu.data = image_data
+        self.hdu.header.update(wcs.to_header())
+        self.hdu.writeto(f'{self.image_directory}/{filename}', overwrite=True)
         return self
 
 if __name__ == '__main__':

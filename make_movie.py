@@ -4,6 +4,7 @@ from astropy.utils.data import get_pkg_data_filename
 from timeit import default_timer as timer
 import pandas as pd
 import argparse
+from numpy import sqrt, abs
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser("Make movie from fits file.")
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     start = timer()
 
     if args.framerate: FRAMERATE = args.framerate
-    else: FRAMERATE = 60
+    else: FRAMERATE = 20
 
     if args.downloading == 1:
         download = input('Paste here your url where to find the fits file: ')
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         else:
             file = 'fits/elias.fits'
         Movie = MovieMaker(fits_file=get_pkg_data_filename(file),
-                           imsize=0.4,#defaul imsize
+                           imsize=0.4,#default imsize
                             framerate=FRAMERATE, zoom_effect=False)
 
     if args.csvfile:#go through all objects in csv file
@@ -48,33 +49,32 @@ if __name__ == '__main__':
         start_dec = start_coord.dec.degree
         start_ra = start_coord.ra.degree
 
-        Movie.zoom_in(N_frames=800, first_time=True)
+        Movie.zoom(N_frames=int(10*Movie.framerate), first_time=True)
         for n in range(len(df)-1):#stack multiple sources
             if n > 0:
                 dist = distance([last_RA, last_DEC], [df['RA'].values[n], df['DEC'].values[n]])
-                move_to_frames = int(250*dist)
+                move_to_frames = int(6*dist*Movie.framerate)
             else:
                 dist = distance([start_ra, start_dec], [df['RA'].values[n], df['DEC'].values[n]])
-                move_to_frames = int(250*dist)
-            print(f'Number of frames {move_to_frames}')
+                move_to_frames = int(6*dist*Movie.framerate)
             Movie.move_to(N_frames=move_to_frames, ra=df['RA'].values[n], dec=df['DEC'].values[n])
-            Movie.zoom_in(N_frames=300, imsize_out=df['imsize'].values[n])
+            zoom_frames = int(0.1 * Movie.framerate * Movie.imsize / df['imsize'].values[n])
+            Movie.zoom(N_frames=zoom_frames, imsize_out=df['imsize'].values[n])
             if n<len(df)-1 and df['imsize'].values[n+1]>df['imsize'].values[n]:
                 im_out = max(df['imsize'].values[n+1]+0.3, 0.3)
             else:
                 im_out = max(df['imsize'].values[n] + 0.3, 0.3)
-            Movie.zoom_out(N_frames=300, imsize_out=im_out)
+            Movie.zoom(N_frames=zoom_frames//5, imsize_out=im_out)
             last_RA, last_DEC = df['RA'].values[n], df['DEC'].values[n]
-        print(f"Number of frames {int(400*distance([start_ra, start_dec], [df['RA'].values[-1], df['DEC'].values[-1]]))}")
-        Movie.move_to(N_frames=int(400*distance([start_ra, start_dec], [df['RA'].values[-1], df['DEC'].values[-1]])), ra=start_ra, dec=start_dec)
-        Movie.zoom_out(N_frames=800, imsize_out=2)
+        move_to_frames = move_to_frames = int(6*Movie.framerate * distance([start_ra, start_dec], [last_RA, last_DEC]))
+        Movie.move_to(N_frames=move_to_frames, ra=start_ra, dec=start_dec)
+        Movie.zoom(N_frames=int(10*Movie.framerate), imsize_out=2)
         Movie.record()
 
         end = timer()
         print(f'MovieMaker took {int(end - start)} seconds')
 
     else:#go through whole field
-        from numpy import sqrt, abs, isnan
         fits_header = Movie.wcs.to_header()
 
         number_of_steps = int(fits_header['CRPIX1']*2/3500)
@@ -112,7 +112,7 @@ if __name__ == '__main__':
                                                            if not isNaN(Movie.image_data[position[0], position[1]])]]
 
         Movie.imsize = 2*abs(fits_header['CDELT1']*fits_header['CRPIX1']/number_of_steps)
-        Movie.zoom_in(N_frames=600, first_time=True)
+        Movie.zoom(N_frames=int(5*Movie.framerate), first_time=True)
         start_coord = Movie.wcs.pixel_to_world(Movie.image_data.shape[0] / 2, Movie.image_data.shape[0] / 2)
         start_dec = start_coord.dec.degree
         start_ra = start_coord.ra.degree
@@ -121,8 +121,7 @@ if __name__ == '__main__':
                 dist = distance([start_ra, start_dec], [position[0], position[1]])
             else:
                 dist = distance([position[0], position[1]], [positions[n-1][0], positions[n-1][1]])
-            move_to_frames = int(200 * dist)
-            print(f'Number of frames {move_to_frames}')
+            move_to_frames = int(6*dist*Movie.framerate)
             Movie.move_to(N_frames=move_to_frames, ra=position[0], dec=position[1])
-        Movie.zoom_out(N_frames=600, imsize_out=3)
+        Movie.zoom(N_frames=int(5*Movie.framerate), imsize_out=3)
         Movie.record()

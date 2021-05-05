@@ -28,13 +28,14 @@ if __name__ == '__main__':
             file = 'fits/lockman_hole.fits'
         Image = ImagingLofar(fits_file=get_pkg_data_filename(file))
 
-    Image.imaging(image_name='main.png', save=True, gaussian=True, dpi=3000)
+    Image.imaging(image_name='main.png', save=True, dpi=3000)
 
     for n, position in enumerate(df):
         if position[3]==position[3]:
-            Image.image_cutout(pos=tuple(position[0:2]), size=tuple(position[2:4]), image_name=f'cutout_{n}.png', gaussian=True, save=True, cmap= 'jet')
+            Image.image_cutout(pos=tuple(position[0:2]), size=tuple(position[2:4]), image_name=f'cutout_{n}.png',
+                               save=True, cmap='jet')
         else:
-            Image.image_cutout(pos=tuple(position[0:2]), image_name=f'cutout_{n}.png', gaussian=True, save=True, cmap= 'jet')
+            Image.image_cutout(pos=tuple(position[0:2]), image_name=f'cutout_{n}.png', save=True, cmap='jet')
 
     try:
         os.system('python poster/scripts/make_pdf.py')

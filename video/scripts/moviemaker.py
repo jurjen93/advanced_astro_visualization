@@ -4,9 +4,9 @@ from multiprocessing import cpu_count, Pool
 from multiprocessing.dummy import Pool as ThreadPool
 import warnings
 from poster.scripts.imaging import ImagingLofar
-from tqdm import tqdm
 import cv2 as cv
 from glob import glob
+from termcolor import colored
 warnings.filterwarnings("ignore")
 
 __all__ = ['MovieMaker']
@@ -17,13 +17,14 @@ class MovieMaker(ImagingLofar):
     """
     def __init__(self, fits_file: str = None, imsize: float = None, framerate: float = None, process: str = None,
                  fits_download: bool=False, new: bool = True, text: str = None, vmin: float = None, vmax: float = None, zoom_effect: bool = False,
-                 output_file: str = 'video/frames'):
+                 output_file: str = 'video/frames', cmap: str = None):
         """
         :param fits_file: fits file name
         :param imsize: initial image size
         :param framerate: frame rate
         :param process: process [multiprocess, multithread, None]
         :param fits_download: download fits file
+        :param cmap: choose your favorite cmap
         """
         self.output_file = output_file
         super().__init__(fits_file = fits_file, image_directory=self.output_file, verbose=False, fits_download=fits_download, vmin=vmin, vmax=vmax, zoom_effect=zoom_effect)
@@ -34,6 +35,11 @@ class MovieMaker(ImagingLofar):
         self.dec = None
         self.text = text
         self.zoom_effect = zoom_effect
+        self.total_count = 0
+        if cmap:
+            self.cmap = cmap
+        else:
+            self.cmap = 'CMRmap'
         if new:
             os.system(f'rm -rf {output_file}; mkdir {output_file}')
 
@@ -77,11 +83,13 @@ class MovieMaker(ImagingLofar):
         :param imsize: image size (pixel or degree size)
         :param dpi: dots per inch (pixel density)
         """
+        print(colored(f"Frame number: {N-self.N_min}/{self.N_max-self.N_min}", 'red'), end='\r')
+
         self.image_cutout(pos=(ra, dec),
                           size=(np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*1.77)),
                           dpi=dpi,
                           image_name=f'image_{str(N).rjust(5, "0")}.png',
-                          cmap='CMRmap',
+                          cmap=self.cmap,
                           text=self.text,
                           imsize=imsize)
         return self
@@ -91,10 +99,14 @@ class MovieMaker(ImagingLofar):
         Record individual frames and save in video/frames/
         ------------------------------------------------------------
         """
-        N_max = len(os.listdir(self.output_file))+len(self.ragrid) #max number of videos
-        N_min = len(os.listdir(self.output_file)) #min number of videos
-        inputs = zip(range(N_min, N_max), self.ragrid, self.decgrid, self.imsizes,
+        self.N_max = len(os.listdir(self.output_file))+len(self.ragrid) #max number of videos
+        self.N_min = len(os.listdir(self.output_file)) #min number of videos
+        inputs = zip(range(self.N_min, self.N_max), self.ragrid, self.decgrid, self.imsizes,
                      np.clip(200/np.array(self.imsizes), a_min=450, a_max=700).astype(int))
+
+        print('-------------------------------------------------')
+        print(colored(f'Imaging {len(self.ragrid)} frames for current move.', 'green'))
+
         if self.process == "multithread":
             print(f"Multithreading")
             print(f"Might get error or bad result because multithreading is difficult with imaging.")
@@ -103,11 +115,22 @@ class MovieMaker(ImagingLofar):
         elif self.process == 'multiprocess':
             cpus=2
             print(f"You are using {cpus} cpu's for multiprocessing")
-            with Pool(cpus) as p:
-                p.starmap(self.make_frame, inputs, chunksize=2)
+            def chunked_input(input, chunksize):
+                input = list(input)
+                input_out=[]
+                for r in range(chunksize):
+                    input_out +=input[r::chunksize]
+                del input
+                return input_out
+            try:
+                with Pool(cpus) as p:
+                    p.starmap(self.make_frame, chunked_input(inputs,cpus), chunksize=cpus)
+            except:
+                pass
         else:
-            for inp in tqdm(inputs):
+            for inp in inputs:
                 self.make_frame(inp[0], inp[1], inp[2], inp[3], inp[4])
+        print('-------------------------------------------------')
         return self
 
     def move_to(self, first_time: bool = False, ra: float = None, dec: float = None, N_frames: int = None):
@@ -136,7 +159,7 @@ class MovieMaker(ImagingLofar):
         self.make_frames()
         return self
 
-    def zoom_in(self, N_frames: int = None, first_time: bool=False, imsize_out: float = None, full_im: bool = False):
+    def zoom(self, N_frames: int = None, first_time: bool=False, imsize_out: float = None, full_im: bool = False):
         """
         Zoom in.
         ------------------------------------------------------------
@@ -145,6 +168,7 @@ class MovieMaker(ImagingLofar):
         :param imsize_out: Output image size.
         :param full_im: start with full image. Otherwise with 1/4th (can be manually changed if needed)
         """
+
         if first_time:
             begin_size = self.image_data.shape[0] * np.max(self.wcs.pixel_scale_matrix)
             if not full_im:
@@ -156,26 +180,26 @@ class MovieMaker(ImagingLofar):
         else:
             begin_size = self.imsize
             end_size = imsize_out
-        self.imsizes = np.linspace(end_size, begin_size, N_frames)[::-1]
+        self.imsizes = np.linspace(begin_size, end_size, N_frames)
         self.imsize = self.imsizes[-1]
         self.ragrid = np.array([self.ra]*len(self.imsizes))
         self.decgrid = np.array([self.dec]*len(self.imsizes))
         self.make_frames()
         return self
 
-    def zoom_out(self, N_frames: int = None, imsize_out: float = None):
-        """
-        Zoom out.
-        ------------------------------------------------------------
-        :param N_frames: Number of frames.
-        :param imsize_out: Output image size.
-        """
-        self.imsizes = np.linspace(self.imsize, imsize_out, N_frames)
-        self.imsize = imsize_out
-        self.ragrid = np.array([self.ra]*len(self.imsizes))
-        self.decgrid = np.array([self.dec]*len(self.imsizes))
-        self.make_frames()
-        return self
+    # def zoom_out(self, N_frames: int = None, imsize_out: float = None):
+    #     """
+    #     Zoom out.
+    #     ------------------------------------------------------------
+    #     :param N_frames: Number of frames.
+    #     :param imsize_out: Output image size.
+    #     """
+    #     self.imsizes = np.linspace(self.imsize, imsize_out, N_frames)
+    #     self.imsize = imsize_out
+    #     self.ragrid = np.array([self.ra]*len(self.imsizes))
+    #     self.decgrid = np.array([self.dec]*len(self.imsizes))
+    #     self.make_frames()
+    #     return self
 
     def record(self, audio: str = None):
         """

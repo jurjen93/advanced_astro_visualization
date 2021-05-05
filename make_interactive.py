@@ -17,9 +17,9 @@ if __name__ == '__main__':
         if args.fits:
             file = args.fits
         else:
-            file = 'fits/lockman_hole.fits'
+            file = 'fits/mosaic-blanked.fits'
         Image = Interactive(fits_file=get_pkg_data_filename(file))
 
-    image = Interactive(fits_file='fits/lockman_hole.fits')
-    image.imaging(image_name='main.png', save=True, dpi=1000)
+    image = Interactive(fits_file=file)
+    image.imaging(image_name='main.png', save=True, dpi=750)
     image.html_from_png()
