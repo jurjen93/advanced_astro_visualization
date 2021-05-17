@@ -13,7 +13,7 @@ You need to clone this repo with (in the location you want to have the scripts):
 
 ### Install requirements
 Now you can install the requirements and make aliases to simplify commands with:\
-```./setup.sh```
+```./setup.sh```\
 If you get permission denied or access error, please give access with:\
 ```chmod u+x ./setup.sh```
 
