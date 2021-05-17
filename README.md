@@ -9,7 +9,7 @@ https://lofar-surveys.org/
 
 ### Clone repo
 You need to clone this repo with (in the location you want to have the scripts):\
-```git clone https://github.com/jurjen93/advanced_astro_visualiziation.git```
+```git clone https://github.com/jurjen93/advanced_astro_visualization.git```
 
 ### Install requirements
 Go to ```advanced_astro_visualization``` with:\
