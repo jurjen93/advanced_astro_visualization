@@ -8,12 +8,14 @@ Other .fits files from LOFAR can be found here:
 https://lofar-surveys.org/
 
 ### Clone repo
-You need to clone this repo with:\
+You need to clone this repo with (in the location you want to have the scripts):\
 ```git clone https://github.com/jurjen93/advanced_astro_visualiziation.git```
 
 ### Install requirements
 Now you can install the requirements and make aliases to simplify commands with:\
 ```./setup.sh```
+If you get permission denied or access error, please give access with:\
+```chmod u+x ./setup.sh```
 
 ### Catalogue csv file
 You need to have a catalogue with sources for the poster (for the video it is optional). We have an example given in the folder 'catalogue'.\
