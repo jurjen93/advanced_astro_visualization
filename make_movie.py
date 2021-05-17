@@ -49,14 +49,14 @@ if __name__ == '__main__':
         start_dec = start_coord.dec.degree
         start_ra = start_coord.ra.degree
 
-        Movie.zoom(N_frames=int(10*Movie.framerate), first_time=True)
+        Movie.zoom(N_frames=int(5*Movie.framerate), first_time=True)
         for n in range(len(df)-1):#stack multiple sources
             if n > 0:
                 dist = distance([last_RA, last_DEC], [df['RA'].values[n], df['DEC'].values[n]])
-                move_to_frames = int(6*dist*Movie.framerate)
+                move_to_frames = int(4*dist*Movie.framerate)
             else:
                 dist = distance([start_ra, start_dec], [df['RA'].values[n], df['DEC'].values[n]])
-                move_to_frames = int(6*dist*Movie.framerate)
+                move_to_frames = int(4*dist*Movie.framerate)
             Movie.move_to(N_frames=move_to_frames, ra=df['RA'].values[n], dec=df['DEC'].values[n])
             zoom_frames = int(0.1 * Movie.framerate * Movie.imsize / df['imsize'].values[n])
             Movie.zoom(N_frames=zoom_frames, imsize_out=df['imsize'].values[n])
@@ -66,9 +66,9 @@ if __name__ == '__main__':
                 im_out = max(df['imsize'].values[n] + 0.3, 0.3)
             Movie.zoom(N_frames=zoom_frames//5, imsize_out=im_out)
             last_RA, last_DEC = df['RA'].values[n], df['DEC'].values[n]
-        move_to_frames = move_to_frames = int(6*Movie.framerate * distance([start_ra, start_dec], [last_RA, last_DEC]))
+        move_to_frames = move_to_frames = int(4*Movie.framerate * distance([start_ra, start_dec], [last_RA, last_DEC]))
         Movie.move_to(N_frames=move_to_frames, ra=start_ra, dec=start_dec)
-        Movie.zoom(N_frames=int(10*Movie.framerate), imsize_out=2)
+        Movie.zoom(N_frames=int(5*Movie.framerate), imsize_out=2)
         Movie.record()
 
         end = timer()
@@ -112,7 +112,7 @@ if __name__ == '__main__':
                                                            if not isNaN(Movie.image_data[position[0], position[1]])]]
 
         Movie.imsize = 2*abs(fits_header['CDELT1']*fits_header['CRPIX1']/number_of_steps)
-        Movie.zoom(N_frames=int(5*Movie.framerate), first_time=True)
+        Movie.zoom(N_frames=int(3*Movie.framerate), first_time=True)
         start_coord = Movie.wcs.pixel_to_world(Movie.image_data.shape[0] / 2, Movie.image_data.shape[0] / 2)
         start_dec = start_coord.dec.degree
         start_ra = start_coord.ra.degree
@@ -121,7 +121,7 @@ if __name__ == '__main__':
                 dist = distance([start_ra, start_dec], [position[0], position[1]])
             else:
                 dist = distance([position[0], position[1]], [positions[n-1][0], positions[n-1][1]])
-            move_to_frames = int(6*dist*Movie.framerate)
+            move_to_frames = int(4*dist*Movie.framerate)
             Movie.move_to(N_frames=move_to_frames, ra=position[0], dec=position[1])
-        Movie.zoom(N_frames=int(5*Movie.framerate), imsize_out=3)
+        Movie.zoom(N_frames=int(3*Movie.framerate), imsize_out=3)
         Movie.record()

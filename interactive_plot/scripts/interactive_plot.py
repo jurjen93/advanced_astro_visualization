@@ -11,6 +11,8 @@ class Interactive(ImagingLofar):
         output_file('interactive.html')
         x_low, y_low = list(float(i) for i in self.wcs.array_index_to_world_values(0, 0))
         x_high, y_high = list(float(i) for i in self.wcs.array_index_to_world_values(self.image_data.shape[0], self.image_data.shape[1]))
+        print(x_low, y_low)
+        print(x_high, y_high)
         p = figure(x_range=(x_low, x_high), y_range=(y_low, y_high), tools='hover,pan,wheel_zoom',
                    active_scroll='wheel_zoom', active_drag='pan')
         p.image_url(['interactive_plot/images/main.png'], x=x_low, y=y_high, h=y_high-y_low, w=x_low-x_high)
