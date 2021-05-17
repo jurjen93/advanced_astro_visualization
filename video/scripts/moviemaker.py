@@ -223,10 +223,10 @@ def crop_center(img,cropx,cropy):
     return img[starty:starty+cropy,startx:startx+cropx,:]
 
 def fading_effect(source, frames):
-    images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/frames_high/*')
+    images = glob('/home/jurjen/Documents/Python/advanced_astro_visualization/frames_high/*')
     img1 = cv.imread(sorted(images)[-1])
     img1 = cv.GaussianBlur(img1, (5,5), 0)
-    img2 = cv.imread(glob(f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/fits/highres_P205/{source}*MFS-image.png')[0])
+    img2 = cv.imread(glob(f'/home/jurjen/Documents/Python/advanced_astro_visualization/fits/highres_P205/{source}*MFS-image.png')[0])
 
     #add extra empty rows to reshape img2
     add_rows = int((img1.shape[1]/img1.shape[0]*img2.shape[1]-img2.shape[1])/2)
@@ -244,8 +244,8 @@ def fading_effect(source, frames):
         if alpha==1:
             n=frames//6
         for r in range(n):
-            images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/frames_high/*')
-            new_im_name = f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/frames_high/image_{str(len(images)).rjust(5, "0")}.png'
+            images = glob('/home/jurjen/Documents/Python/advanced_astro_visualization/frames_high/*')
+            new_im_name = f'/home/jurjen/Documents/Python/advanced_astro_visualization/frames_high/image_{str(len(images)).rjust(5, "0")}.png'
             cv.imwrite(new_im_name, output)
 
 if __name__ == '__main__':
