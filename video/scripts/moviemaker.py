@@ -17,7 +17,7 @@ class MovieMaker(ImagingLofar):
     """
     def __init__(self, fits_file: str = None, imsize: float = None, framerate: float = None, process: str = None,
                  fits_download: bool=False, new: bool = True, text: str = None, vmin: float = None, vmax: float = None, zoom_effect: bool = False,
-                 output_file: str = 'video/frames', cmap: str = None):
+                 output_file: str = 'frames', cmap: str = None):
         """
         :param fits_file: fits file name
         :param imsize: initial image size
@@ -96,7 +96,7 @@ class MovieMaker(ImagingLofar):
 
     def make_frames(self):
         """
-        Record individual frames and save in video/frames/
+        Record individual frames and save in frames/
         ------------------------------------------------------------
         """
         self.N_max = len(os.listdir(self.output_file))+len(self.ragrid) #max number of videos
@@ -223,7 +223,7 @@ def crop_center(img,cropx,cropy):
     return img[starty:starty+cropy,startx:startx+cropx,:]
 
 def fading_effect(source, frames):
-    images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/video/frames_high/*')
+    images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/frames_high/*')
     img1 = cv.imread(sorted(images)[-1])
     img1 = cv.GaussianBlur(img1, (5,5), 0)
     img2 = cv.imread(glob(f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/fits/highres_P205/{source}*MFS-image.png')[0])
@@ -244,8 +244,8 @@ def fading_effect(source, frames):
         if alpha==1:
             n=frames//6
         for r in range(n):
-            images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/video/frames_high/*')
-            new_im_name = f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/video/frames_high/image_{str(len(images)).rjust(5, "0")}.png'
+            images = glob('/home/jurjen/Documents/Python/advanced_astro_visualiziation/frames_high/*')
+            new_im_name = f'/home/jurjen/Documents/Python/advanced_astro_visualiziation/frames_high/image_{str(len(images)).rjust(5, "0")}.png'
             cv.imwrite(new_im_name, output)
 
 if __name__ == '__main__':

@@ -8,8 +8,12 @@ Other .fits files from LOFAR can be found here:
 https://lofar-surveys.org/
 
 ### Clone repo
-You need to clone this repo with:
+You need to clone this repo with:\
 ```git clone https://github.com/jurjen93/advanced_astro_visualiziation.git```
+
+### Install requirements
+Now you can install the requirements and make aliases to simplify commands with:\
+```./setup.sh```
 
 ### Catalogue csv file
 You need to have a catalogue with sources for the poster (for the video it is optional). We have an example given in the folder 'catalogue'.\
@@ -27,18 +31,18 @@ First, download **Scribus**:
 https://sourceforge.net/projects/scribus/files/scribus-devel/1.5.5/scribus-1.5.5-windows-x64.exe/download
 
 Run now:\
-```python make_poster.py```\
+```makeposter```\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
 * ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster.
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example:\
-```python make_poster.py -csv catalogue/catalogue_lockman.csv -fi fits/lockman_hole.fits```
+```makeposter -csv catalogue/catalogue_lockman.csv -fi fits/lockman_hole.fits```
   
 ### How to make the video
 Run:\
-```python make_video.py```\
+```makevideo```\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
 * ```-csv``` -> Give a specific csv file with sources to include as cutouts in the poster. If you leave it empty, it goes through the whole field.
@@ -46,11 +50,11 @@ where you can use the following flags
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example pan through source by source from your csv file:\
-```python make_video.py -csv catalogue/catalogue_lockman.csv -d 1 -f 60```\
+```makevideo -csv catalogue/catalogue_lockman.csv -d 1 -f 60```\
 Example of pan through a whole field:\
-```python make_video.py -fi fits/your_fits.fits```\
+```makevideo -fi fits/your_fits.fits```\
 In the video one can see the coordinates. If you want to make a separate image from this, you can run the following:\
-```python make_image.py -fi fits/your_fits.fits -ra 123.123 -dec 51.123 -si 0.4```\
+```makeimage -fi fits/your_fits.fits -ra 123.123 -dec 51.123 -si 0.4```\
 where you can use the following flags
 * ```-si``` -> Size in degrees.
 * ```-dec``` -> Declination in degrees.
@@ -62,13 +66,13 @@ https://towardsdatascience.com/how-to-make-a-video-from-your-astronomy-images-95
 
 ### How to make the interactive plot
 Run:\
-```python make_interactive.py```\
+```makeinteractive```\
 where you can use the following flags
 * ```-d``` -> Choose to download a specific fits file from the internet. Use ```1``` if you want to, leave empty otherwise.
 * ```-fi``` -> Fits file to use. (If you don't download your fits file)
 
 Example:\
-```python make_interactive.py -fi fits/your_fits.fits```
+```makeinteractive -fi fits/your_fits.fits```
 
 ### Output
 **Poster**: *poster.pdf*\

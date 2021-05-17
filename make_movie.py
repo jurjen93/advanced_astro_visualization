@@ -38,7 +38,11 @@ if __name__ == '__main__':
             file = args.fits
         else:
             file = 'fits/elias.fits'
-        Movie = MovieMaker(fits_file=get_pkg_data_filename(file),
+        try:
+            fitsfile=get_pkg_data_filename(file)
+        except:
+            fitsfile=file
+        Movie = MovieMaker(fits_file=fitsfile,
                            imsize=0.4,#default imsize
                             framerate=FRAMERATE, zoom_effect=False)
 
