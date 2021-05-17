@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #install requirements
-pip install -r requirements.txt
+pip install --user -r requirements.txt
 
 #make alias to run script easier
 alias makevideo="python3 $PWD/make_movie.py"
