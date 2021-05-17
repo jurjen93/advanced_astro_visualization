@@ -12,6 +12,8 @@ You need to clone this repo with (in the location you want to have the scripts):
 ```git clone https://github.com/jurjen93/advanced_astro_visualiziation.git```
 
 ### Install requirements
+Go to ```advanced_astro_visualization``` with:\
+```cd advanced_astro_visualization```\
 Now you can install the requirements and make aliases to simplify commands with:\
 ```./setup.sh```\
 If you get permission denied or access error, please give access with:\
