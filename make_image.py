@@ -19,7 +19,7 @@ filename = '_'.join(args.fits.split('/')[-1].split('.')[0:-1]+[str(args.right_as
 
 Image = ImagingLofar(fits_file=args.fits, image_directory='cutouts', verbose=False)
 Image.image_cutout(image_name=filename+'.png',
-              dpi=1000, pos=(args.right_ascension, args.declination), imsize=imsize)
+              dpi=100, pos=(args.right_ascension, args.declination), imsize=imsize)
 print(f'Made {filename}.png')
 Image.make_fits(pos=(args.right_ascension, args.declination), imsize=0.4,
                 filename=filename+'.fits')

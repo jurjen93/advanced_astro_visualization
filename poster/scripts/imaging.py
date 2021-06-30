@@ -107,9 +107,12 @@ class ImagingLofar:
         :param wcs: coordinate system
         :param image_name: name of your output image
         :param dpi: dots per inch
-        :param save: save the image (yes or no)
+        :param save: save image (True/False)
         :param cmap: cmap of your image
         :param text: text in the left down corner of your image
+        :param imsize: image size in degrees
+        :param ra: right ascension
+        :param dec: declination
         """
 
         if image_data is None:

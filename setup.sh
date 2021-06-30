@@ -3,6 +3,9 @@
 #install requirements
 pip install --user -r requirements.txt
 
+#get latest ffmpeg
+module load FFmpeg/4.2.2-GCCcore-9.3.0
+
 #make alias to run script easier
 alias makevideo="python3 $PWD/make_movie.py"
 alias makeimage="python3 $PWD/make_image.py"
