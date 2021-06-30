@@ -166,7 +166,7 @@ class MovieMaker(ImagingLofar):
         :param N_frames: Number of frames.
         :param first_time: Is this the first move? If so, give True.
         :param imsize_out: Output image size.
-        :param full_im: start with full image. Otherwise with 1/4th (can be manually changed if needed)
+        :param full_im: start with full image (when first_time==True)
         """
 
         if first_time:
