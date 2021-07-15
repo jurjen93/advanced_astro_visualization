@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser("Make movie from fits file.")
 parser.add_argument('-d', '--downloading', type=int, help='Download your own data')
 parser.add_argument('-csv', '--csvfile', help='Csv file with outliers with RA and DEC in degrees')
-parser.add_argument('-fr', '--framerate', help='Frame rate of your video')
+parser.add_argument('-fr', '--framerate', type=int, help='Frame rate of your video')
 parser.add_argument('-fi', '--fits', type=str, help='Fits file to use')
 args = parser.parse_args()
 
@@ -111,9 +111,13 @@ if __name__ == '__main__':
                 pos_x = pos_x + ((-1)**(i+number_of_steps))*step_size_x
                 positions.append([pos_x, pos_y])
 
-        positions = [(p.ra.degree, p.dec.degree) for p in [Movie.wcs.pixel_to_world(position[0], position[1])
-                                                           for position in positions
-                                                           if not isNaN(Movie.image_data[position[0], position[1]])]]
+        try:
+            positions = [(p.ra.degree, p.dec.degree) for p in [Movie.wcs.pixel_to_world(position[0], position[1])
+                                                               for position in positions
+                                                               if not isNaN(Movie.image_data[position[0], position[1]])]]
+        except:
+            positions = [(p.ra.degree, p.dec.degree) for p in [Movie.wcs.pixel_to_world(position[0], position[1])
+                                                               for position in positions]]
 
         Movie.imsize = 2*abs(fits_header['CDELT1']*fits_header['CRPIX1']/number_of_steps)
         Movie.zoom(N_frames=int(3*Movie.framerate), first_time=True)

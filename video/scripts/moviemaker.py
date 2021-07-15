@@ -168,7 +168,6 @@ class MovieMaker(ImagingLofar):
         :param imsize_out: Output image size.
         :param full_im: start with full image (when first_time==True)
         """
-
         if first_time:
             begin_size = self.image_data.shape[0] * np.max(self.wcs.pixel_scale_matrix)
             if not full_im:
