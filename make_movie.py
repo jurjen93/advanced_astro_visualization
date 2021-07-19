@@ -57,20 +57,20 @@ if __name__ == '__main__':
         for n in range(len(df)-1):#stack multiple sources
             if n > 0:
                 dist = distance([last_RA, last_DEC], [df['RA'].values[n], df['DEC'].values[n]])
-                move_to_frames = int(4*dist*Movie.framerate)
+                move_to_frames = max(int(4*dist*Movie.framerate), 2)
             else:
                 dist = distance([start_ra, start_dec], [df['RA'].values[n], df['DEC'].values[n]])
-                move_to_frames = int(4*dist*Movie.framerate)
+                move_to_frames = max(int(4*dist*Movie.framerate), 2)
             Movie.move_to(N_frames=move_to_frames, ra=df['RA'].values[n], dec=df['DEC'].values[n])
-            zoom_frames = int(0.1 * Movie.framerate * Movie.imsize / df['imsize'].values[n])
+            zoom_frames = max(int(0.1 * Movie.framerate * Movie.imsize / df['imsize'].values[n]), 2)
             Movie.zoom(N_frames=zoom_frames, imsize_out=df['imsize'].values[n])
             if n<len(df)-1 and df['imsize'].values[n+1]>df['imsize'].values[n]:
                 im_out = max(df['imsize'].values[n+1]+0.3, 0.3)
             else:
                 im_out = max(df['imsize'].values[n] + 0.3, 0.3)
-            Movie.zoom(N_frames=zoom_frames//5, imsize_out=im_out)
+            Movie.zoom(N_frames=max(zoom_frames//5, 1), imsize_out=im_out)
             last_RA, last_DEC = df['RA'].values[n], df['DEC'].values[n]
-        move_to_frames = move_to_frames = int(4*Movie.framerate * distance([start_ra, start_dec], [last_RA, last_DEC]))
+        move_to_frames = max(int(4*Movie.framerate * distance([start_ra, start_dec], [last_RA, last_DEC])), 2)
         Movie.move_to(N_frames=move_to_frames, ra=start_ra, dec=start_dec)
         Movie.zoom(N_frames=int(5*Movie.framerate), imsize_out=2)
         Movie.record()
@@ -129,7 +129,7 @@ if __name__ == '__main__':
                 dist = distance([start_ra, start_dec], [position[0], position[1]])
             else:
                 dist = distance([position[0], position[1]], [positions[n-1][0], positions[n-1][1]])
-            move_to_frames = int(4*dist*Movie.framerate)
+            move_to_frames = max(int(4*dist*Movie.framerate), 2)
             Movie.move_to(N_frames=move_to_frames, ra=position[0], dec=position[1])
         Movie.zoom(N_frames=int(3*Movie.framerate), imsize_out=3)
         Movie.record()
