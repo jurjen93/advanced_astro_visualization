@@ -85,8 +85,15 @@ class MovieMaker(ImagingLofar):
         """
         print(colored(f"Frame number: {N-self.N_min}/{self.N_max-self.N_min}", 'red'), end='\r')
 
+        ## reduce jitter by always having a central pixel (force odd size)
+        size1 = np.int(imsize/np.max(self.wcs.pixel_scale_matrix))
+        size2 = np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*1.77)
+        if size1%2 == 0:
+            size1 = size1 + 1
+        if size2%2 == 0:
+            size2 = size2 + 1
         self.image_cutout(pos=(ra, dec),
-                          size=(np.int(imsize/np.max(self.wcs.pixel_scale_matrix)), np.int(imsize/np.max(self.wcs.pixel_scale_matrix)*1.77)),
+                          size=(size1,size2),
                           dpi=dpi,
                           image_name=f'image_{str(N).rjust(5, "0")}.png',
                           cmap=self.cmap,
@@ -173,7 +180,7 @@ class MovieMaker(ImagingLofar):
             if not full_im:
                 begin_size/=2
             end_size = self.imsize
-            coordinates = self.wcs.pixel_to_world(int(self.image_data.shape[0]/2), int(self.image_data.shape[0]/2))
+            coordinates = self.wcs.pixel_to_world(int(self.image_data.shape[1]/2), int(self.image_data.shape[0]/2))
             self.dec = coordinates.dec.degree
             self.ra = coordinates.ra.degree
         else:
