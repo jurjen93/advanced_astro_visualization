@@ -49,7 +49,7 @@ if __name__ == '__main__':
     if args.csvfile:#go through all objects in csv file
         df = pd.read_csv(args.csvfile)[['RA', 'DEC', 'imsize']]
 
-        start_coord = Movie.wcs.pixel_to_world(Movie.image_data.shape[0]/2, Movie.image_data.shape[0]/2)
+        start_coord = Movie.wcs.pixel_to_world(Movie.image_data.shape[1]/2, Movie.image_data.shape[0]/2)
         start_dec = start_coord.dec.degree
         start_ra = start_coord.ra.degree
 
