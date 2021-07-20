@@ -173,7 +173,7 @@ class MovieMaker(ImagingLofar):
             if not full_im:
                 begin_size/=2
             end_size = self.imsize
-            coordinates = self.wcs.pixel_to_world(int(self.image_data.shape[0]/2), int(self.image_data.shape[0]/2))
+            coordinates = self.wcs.pixel_to_world(int(self.image_data.shape[1]/2), int(self.image_data.shape[0]/2))
             self.dec = coordinates.dec.degree
             self.ra = coordinates.ra.degree
         else:
