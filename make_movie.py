@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from astropy.utils.data import get_pkg_data_filename
 
-from paths import ScanPaths
+from video.scripts.paths import ScanPaths
 from video.scripts.moviemaker import MovieMaker
 
 warnings.filterwarnings("ignore")

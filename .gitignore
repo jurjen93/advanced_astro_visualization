@@ -26,3 +26,7 @@ __pycache__
 #files not for github
 highres_*
 leahfiles/
+#yaml files
+*.yml
+#toml files
+*.toml
