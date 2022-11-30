@@ -1,49 +1,396 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
-  
-  <head>
-    
-      <meta charset="utf-8">
-      <title>Bokeh Plot</title>
-      
-      
-        
-          
-        
-        
-          
-        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.js"></script>
-        <script type="text/javascript">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>Bokeh Plot</title>
+
+
+    <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-1.4.0.min.js"></script>
+    <script type="text/javascript">
             Bokeh.set_log_level("info");
-        </script>
-        
-      
-      
-    
-  </head>
-  
-  
-  <body>
-    
-      
-        
-          
-          
-            
-              <div class="bk-root" id="b59e42d7-1ac0-433e-baac-13298399d12f" data-root-id="1001"></div>
-            
-          
-        
-      
-      
-        <script type="application/json" id="1128">
-          {"756a9dfa-b530-48e6-bd1a-04112a4a625b":{"roots":{"references":[{"attributes":{"active_drag":{"id":"1021","type":"PanTool"},"active_inspect":"auto","active_multi":null,"active_scroll":{"id":"1022","type":"WheelZoomTool"},"active_tap":"auto","tools":[{"id":"1020","type":"HoverTool"},{"id":"1021","type":"PanTool"},{"id":"1022","type":"WheelZoomTool"}]},"id":"1023","type":"Toolbar"},{"attributes":{"data_source":{"id":"1027","type":"ColumnDataSource"},"glyph":{"id":"1028","type":"ImageURL"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1029","type":"ImageURL"},"selection_glyph":null,"view":{"id":"1031","type":"CDSView"}},"id":"1030","type":"GlyphRenderer"},{"attributes":{"text":""},"id":"1032","type":"Title"},{"attributes":{},"id":"1021","type":"PanTool"},{"attributes":{"ticker":{"id":"1011","type":"BasicTicker"},"visible":false},"id":"1014","type":"Grid"},{"attributes":{},"id":"1039","type":"UnionRenderers"},{"attributes":{"dimension":1,"ticker":{"id":"1016","type":"BasicTicker"},"visible":false},"id":"1019","type":"Grid"},{"attributes":{},"id":"1036","type":"BasicTickFormatter"},{"attributes":{},"id":"1016","type":"BasicTicker"},{"attributes":{"h":{"units":"data","value":0.416334010883908},"url":{"field":"url"},"w":{"units":"data","value":0.7270338201619779},"x":{"value":205.36142043645785},"y":{"value":55.207897454263446}},"id":"1028","type":"ImageURL"},{"attributes":{"callback":null,"end":55.207897454263446,"start":54.79156344337954},"id":"1004","type":"Range1d"},{"attributes":{},"id":"1038","type":"Selection"},{"attributes":{"axis_label":"DEC (deg)","axis_label_text_font_style":"bold","formatter":{"id":"1036","type":"BasicTickFormatter"},"major_tick_line_color":{"value":"firebrick"},"major_tick_line_width":{"value":3},"major_tick_out":10,"minor_tick_in":-3,"minor_tick_line_color":{"value":"orange"},"minor_tick_out":8,"ticker":{"id":"1016","type":"BasicTicker"}},"id":"1015","type":"LinearAxis"},{"attributes":{},"id":"1022","type":"WheelZoomTool"},{"attributes":{"source":{"id":"1027","type":"ColumnDataSource"}},"id":"1031","type":"CDSView"},{"attributes":{"h":{"units":"data","value":0.416334010883908},"url":{"field":"url"},"w":{"units":"data","value":0.7270338201619779},"x":{"value":205.36142043645785},"y":{"value":55.207897454263446}},"id":"1029","type":"ImageURL"},{"attributes":{"callback":null,"end":204.63438661629587,"start":205.36142043645785},"id":"1002","type":"Range1d"},{"attributes":{},"id":"1034","type":"BasicTickFormatter"},{"attributes":{},"id":"1006","type":"LinearScale"},{"attributes":{"axis_label":"RA (deg)","axis_label_text_font_style":"bold","formatter":{"id":"1034","type":"BasicTickFormatter"},"major_tick_line_color":{"value":"firebrick"},"major_tick_line_width":{"value":3},"major_tick_out":10,"minor_tick_in":-3,"minor_tick_line_color":{"value":"orange"},"minor_tick_out":8,"ticker":{"id":"1011","type":"BasicTicker"}},"id":"1010","type":"LinearAxis"},{"attributes":{"below":[{"id":"1010","type":"LinearAxis"}],"center":[{"id":"1014","type":"Grid"},{"id":"1019","type":"Grid"}],"left":[{"id":"1015","type":"LinearAxis"}],"renderers":[{"id":"1030","type":"GlyphRenderer"}],"title":{"id":"1032","type":"Title"},"toolbar":{"id":"1023","type":"Toolbar"},"x_range":{"id":"1002","type":"Range1d"},"x_scale":{"id":"1006","type":"LinearScale"},"y_range":{"id":"1004","type":"Range1d"},"y_scale":{"id":"1008","type":"LinearScale"}},"id":"1001","subtype":"Figure","type":"Plot"},{"attributes":{},"id":"1011","type":"BasicTicker"},{"attributes":{"callback":null,"data":{"url":["interactive_plot/images/main.png"]},"selected":{"id":"1038","type":"Selection"},"selection_policy":{"id":"1039","type":"UnionRenderers"}},"id":"1027","type":"ColumnDataSource"},{"attributes":{},"id":"1008","type":"LinearScale"},{"attributes":{"callback":null},"id":"1020","type":"HoverTool"}],"root_ids":["1001"]},"title":"Bokeh Application","version":"1.4.0"}}
-        </script>
-        <script type="text/javascript">
+
+    </script>
+
+
+</head>
+
+
+<body>
+
+
+<div class="bk-root" id="b59e42d7-1ac0-433e-baac-13298399d12f" data-root-id="1001"></div>
+
+
+<script type="application/json" id="1128">
+    {
+        "756a9dfa-b530-48e6-bd1a-04112a4a625b": {
+            "roots": {
+                "references": [
+                    {
+                        "attributes": {
+                            "active_drag": {
+                                "id": "1021",
+                                "type": "PanTool"
+                            },
+                            "active_inspect": "auto",
+                            "active_multi": null,
+                            "active_scroll": {
+                                "id": "1022",
+                                "type": "WheelZoomTool"
+                            },
+                            "active_tap": "auto",
+                            "tools": [
+                                {
+                                    "id": "1020",
+                                    "type": "HoverTool"
+                                },
+                                {
+                                    "id": "1021",
+                                    "type": "PanTool"
+                                },
+                                {
+                                    "id": "1022",
+                                    "type": "WheelZoomTool"
+                                }
+                            ]
+                        },
+                        "id": "1023",
+                        "type": "Toolbar"
+                    },
+                    {
+                        "attributes": {
+                            "data_source": {
+                                "id": "1027",
+                                "type": "ColumnDataSource"
+                            },
+                            "glyph": {
+                                "id": "1028",
+                                "type": "ImageURL"
+                            },
+                            "hover_glyph": null,
+                            "muted_glyph": null,
+                            "nonselection_glyph": {
+                                "id": "1029",
+                                "type": "ImageURL"
+                            },
+                            "selection_glyph": null,
+                            "view": {
+                                "id": "1031",
+                                "type": "CDSView"
+                            }
+                        },
+                        "id": "1030",
+                        "type": "GlyphRenderer"
+                    },
+                    {
+                        "attributes": {
+                            "text": ""
+                        },
+                        "id": "1032",
+                        "type": "Title"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1021",
+                        "type": "PanTool"
+                    },
+                    {
+                        "attributes": {
+                            "ticker": {
+                                "id": "1011",
+                                "type": "BasicTicker"
+                            },
+                            "visible": false
+                        },
+                        "id": "1014",
+                        "type": "Grid"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1039",
+                        "type": "UnionRenderers"
+                    },
+                    {
+                        "attributes": {
+                            "dimension": 1,
+                            "ticker": {
+                                "id": "1016",
+                                "type": "BasicTicker"
+                            },
+                            "visible": false
+                        },
+                        "id": "1019",
+                        "type": "Grid"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1036",
+                        "type": "BasicTickFormatter"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1016",
+                        "type": "BasicTicker"
+                    },
+                    {
+                        "attributes": {
+                            "h": {
+                                "units": "data",
+                                "value": 0.416334010883908
+                            },
+                            "url": {
+                                "field": "url"
+                            },
+                            "w": {
+                                "units": "data",
+                                "value": 0.7270338201619779
+                            },
+                            "x": {
+                                "value": 205.36142043645785
+                            },
+                            "y": {
+                                "value": 55.207897454263446
+                            }
+                        },
+                        "id": "1028",
+                        "type": "ImageURL"
+                    },
+                    {
+                        "attributes": {
+                            "callback": null,
+                            "end": 55.207897454263446,
+                            "start": 54.79156344337954
+                        },
+                        "id": "1004",
+                        "type": "Range1d"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1038",
+                        "type": "Selection"
+                    },
+                    {
+                        "attributes": {
+                            "axis_label": "DEC (deg)",
+                            "axis_label_text_font_style": "bold",
+                            "formatter": {
+                                "id": "1036",
+                                "type": "BasicTickFormatter"
+                            },
+                            "major_tick_line_color": {
+                                "value": "firebrick"
+                            },
+                            "major_tick_line_width": {
+                                "value": 3
+                            },
+                            "major_tick_out": 10,
+                            "minor_tick_in": -3,
+                            "minor_tick_line_color": {
+                                "value": "orange"
+                            },
+                            "minor_tick_out": 8,
+                            "ticker": {
+                                "id": "1016",
+                                "type": "BasicTicker"
+                            }
+                        },
+                        "id": "1015",
+                        "type": "LinearAxis"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1022",
+                        "type": "WheelZoomTool"
+                    },
+                    {
+                        "attributes": {
+                            "source": {
+                                "id": "1027",
+                                "type": "ColumnDataSource"
+                            }
+                        },
+                        "id": "1031",
+                        "type": "CDSView"
+                    },
+                    {
+                        "attributes": {
+                            "h": {
+                                "units": "data",
+                                "value": 0.416334010883908
+                            },
+                            "url": {
+                                "field": "url"
+                            },
+                            "w": {
+                                "units": "data",
+                                "value": 0.7270338201619779
+                            },
+                            "x": {
+                                "value": 205.36142043645785
+                            },
+                            "y": {
+                                "value": 55.207897454263446
+                            }
+                        },
+                        "id": "1029",
+                        "type": "ImageURL"
+                    },
+                    {
+                        "attributes": {
+                            "callback": null,
+                            "end": 204.63438661629587,
+                            "start": 205.36142043645785
+                        },
+                        "id": "1002",
+                        "type": "Range1d"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1034",
+                        "type": "BasicTickFormatter"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1006",
+                        "type": "LinearScale"
+                    },
+                    {
+                        "attributes": {
+                            "axis_label": "RA (deg)",
+                            "axis_label_text_font_style": "bold",
+                            "formatter": {
+                                "id": "1034",
+                                "type": "BasicTickFormatter"
+                            },
+                            "major_tick_line_color": {
+                                "value": "firebrick"
+                            },
+                            "major_tick_line_width": {
+                                "value": 3
+                            },
+                            "major_tick_out": 10,
+                            "minor_tick_in": -3,
+                            "minor_tick_line_color": {
+                                "value": "orange"
+                            },
+                            "minor_tick_out": 8,
+                            "ticker": {
+                                "id": "1011",
+                                "type": "BasicTicker"
+                            }
+                        },
+                        "id": "1010",
+                        "type": "LinearAxis"
+                    },
+                    {
+                        "attributes": {
+                            "below": [
+                                {
+                                    "id": "1010",
+                                    "type": "LinearAxis"
+                                }
+                            ],
+                            "center": [
+                                {
+                                    "id": "1014",
+                                    "type": "Grid"
+                                },
+                                {
+                                    "id": "1019",
+                                    "type": "Grid"
+                                }
+                            ],
+                            "left": [
+                                {
+                                    "id": "1015",
+                                    "type": "LinearAxis"
+                                }
+                            ],
+                            "renderers": [
+                                {
+                                    "id": "1030",
+                                    "type": "GlyphRenderer"
+                                }
+                            ],
+                            "title": {
+                                "id": "1032",
+                                "type": "Title"
+                            },
+                            "toolbar": {
+                                "id": "1023",
+                                "type": "Toolbar"
+                            },
+                            "x_range": {
+                                "id": "1002",
+                                "type": "Range1d"
+                            },
+                            "x_scale": {
+                                "id": "1006",
+                                "type": "LinearScale"
+                            },
+                            "y_range": {
+                                "id": "1004",
+                                "type": "Range1d"
+                            },
+                            "y_scale": {
+                                "id": "1008",
+                                "type": "LinearScale"
+                            }
+                        },
+                        "id": "1001",
+                        "subtype": "Figure",
+                        "type": "Plot"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1011",
+                        "type": "BasicTicker"
+                    },
+                    {
+                        "attributes": {
+                            "callback": null,
+                            "data": {
+                                "url": [
+                                    "interactive_plot/images/main.png"
+                                ]
+                            },
+                            "selected": {
+                                "id": "1038",
+                                "type": "Selection"
+                            },
+                            "selection_policy": {
+                                "id": "1039",
+                                "type": "UnionRenderers"
+                            }
+                        },
+                        "id": "1027",
+                        "type": "ColumnDataSource"
+                    },
+                    {
+                        "attributes": {},
+                        "id": "1008",
+                        "type": "LinearScale"
+                    },
+                    {
+                        "attributes": {
+                            "callback": null
+                        },
+                        "id": "1020",
+                        "type": "HoverTool"
+                    }
+                ],
+                "root_ids": [
+                    "1001"
+                ]
+            },
+            "title": "Bokeh Application",
+            "version": "1.4.0"
+        }
+    }
+</script>
+<script type="text/javascript">
           (function() {
             var fn = function() {
               Bokeh.safely(function() {
@@ -78,8 +425,9 @@
             if (document.readyState != "loading") fn();
             else document.addEventListener("DOMContentLoaded", fn);
           })();
-        </script>
-    
-  </body>
-  
+
+</script>
+
+</body>
+
 </html>
