@@ -1,11 +1,8 @@
 ### Details
 
-With this repo you can make a **poster**, a **video**, or **interactive plot** of a full .fits image.
-
-Note that this script is written for **astronomy applications**. However, by rewriting some parts in the script,
-you can also use it for other types of applications. In the example we used the lockman_hole.fits made with LOFAR.\
-Other .fits files from LOFAR can be found here:
-https://lofar-surveys.org/
+With this repository you can make a **poster**, a **video**, or **interactive plot** of a FITS image. The scripts are written 
+for **astronomy applications** but feel free to modify and use it for your own needs.
+In the example we used the FITS file from LOFAR data.\
 
 ### Clone repo
 
